@@ -1,0 +1,20 @@
+{
+  "name": "jon_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test && node tests/broken-links.test.js",
+    "test:playwright": "playwright test",
+    "test:broken-links": "node tests/broken-links.test.js",
+    "test:vibe": "playwright test tests/vibe.spec.ts",
+    "test:headed": "playwright test --headed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require('@playwright/test');
+const path = require('path');
 const { createWaradioPage } = require('../pages');
 
 test.describe('WARADIO App', () => {
@@ -175,6 +176,79 @@ test.describe('WARADIO App', () => {
       await waradioPage.setSpeed('4');
       const speed4x = await waradioPage.getCurrentSpeed();
       expect(speed4x).toBe('4');
+    });
+  });
+
+  test.describe('Load ADIF File', () => {
+    test.beforeEach(async () => {
+      await waradioPage.load();
+    });
+
+    test('can upload ADIF file and update statistics', async () => {
+      const adifPath = path.join(__dirname, '../test-data/test-contacts.adi');
+      await waradioPage.getAdifFileInput().setInputFiles(adifPath);
+      
+      await waradioPage.waitForPlaybackEnabled();
+      
+      const stats = await waradioPage.getStatistics();
+      expect(parseInt(stats.total)).toBe(10);
+      expect(parseInt(stats.plotted)).toBe(0);
+      expect(parseInt(stats.remaining)).toBe(10);
+    });
+
+    test('displays file info after loading ADIF', async () => {
+      const adifPath = path.join(__dirname, '../test-data/test-contacts.adi');
+      await waradioPage.getAdifFileInput().setInputFiles(adifPath);
+      
+      await page.waitForTimeout(500);
+      
+      const fileInfo = await waradioPage.getFileInfo().textContent();
+      expect(fileInfo).toContain('10');
+    });
+
+    test('enables playback after ADIF file upload', async () => {
+      const adifPath = path.join(__dirname, '../test-data/test-contacts.adi');
+      await waradioPage.getAdifFileInput().setInputFiles(adifPath);
+      
+      await expect(waradioPage.getPlayButton()).toBeEnabled();
+      await expect(waradioPage.getPauseButton()).toBeEnabled();
+      await expect(waradioPage.getResetButton()).toBeEnabled();
+    });
+
+    test('can play back ADIF contacts', async () => {
+      const adifPath = path.join(__dirname, '../test-data/test-contacts.adi');
+      await waradioPage.getAdifFileInput().setInputFiles(adifPath);
+      await waradioPage.waitForPlaybackEnabled();
+      
+      await waradioPage.clickPlay();
+      
+      await page.waitForTimeout(3000);
+      
+      const plotted = await waradioPage.getPlottedContacts().textContent();
+      expect(parseInt(plotted)).toBeGreaterThan(0);
+      
+      const contact = await waradioPage.getCurrentContact();
+      expect(contact.callsign).not.toBe('--');
+    });
+
+    test('ADIF and demo data produce similar playback behavior', async () => {
+      await waradioPage.loadDemoData();
+      await waradioPage.clickPlay();
+      await page.waitForTimeout(2000);
+      
+      const demoPlotted = await waradioPage.getPlottedContacts().textContent();
+      
+      await waradioPage.clickReset();
+      await page.waitForTimeout(500);
+      
+      const adifPath = path.join(__dirname, '../test-data/test-contacts.adi');
+      await waradioPage.getAdifFileInput().setInputFiles(adifPath);
+      await waradioPage.clickPlay();
+      await page.waitForTimeout(2000);
+      
+      const adifPlotted = await waradioPage.getPlottedContacts().textContent();
+      
+      expect(parseInt(adifPlotted)).toBeGreaterThan(0);
     });
   });
 });

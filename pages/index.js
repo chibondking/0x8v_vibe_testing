@@ -1,5 +1,6 @@
 const LandingPage = require('./LandingPage');
 const AppPage = require('./AppPage');
+const WaradioPage = require('./WaradioPage');
 const { getAppUrl, getLandingPageUrl } = require('../config');
 
 function createLandingPage(page) {
@@ -11,9 +12,17 @@ function createAppPage(page, appName) {
   return new AppPage(page, appName, appUrl);
 }
 
+function createWaradioPage(page) {
+  return new WaradioPage(page);
+}
+
 function createPage(page, url) {
   if (url.includes('vibe.0x8v.io')) {
     return new LandingPage(page);
+  }
+  
+  if (url.includes('waradio.0x8v.io')) {
+    return new WaradioPage(page);
   }
   
   const appMatch = url.match(/https?:\/\/(\w+)\.0x8v\.io/);
@@ -27,5 +36,6 @@ function createPage(page, url) {
 module.exports = {
   createLandingPage,
   createAppPage,
+  createWaradioPage,
   createPage,
 };

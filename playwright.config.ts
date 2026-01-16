@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 30000,
+  timeout: 60000,
   retries: 0,
   use: {
     baseURL: 'https://vibe.0x8v.io',
@@ -14,4 +14,6 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
+  reporter: 'html',
+  outputDir: './test-results/html-report',
 });

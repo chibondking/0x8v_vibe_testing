@@ -1,0 +1,68 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: ►
+      - heading "GRID SQUARE VISUALIZER" [level=1] [ref=e5]
+    - generic [ref=e6]:
+      - generic [ref=e7]: SYSTEM READY
+      - generic [ref=e8]: 20:13:13 UTC
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - generic [ref=e11]:
+        - heading "DATA INPUT" [level=3] [ref=e12]
+        - generic [ref=e14] [cursor=pointer]: 📁 LOAD ADIF FILE
+        - button "📊 LOAD DEMO DATA" [ref=e15] [cursor=pointer]
+        - generic [ref=e16]:
+          - generic [ref=e17]: "MY GRID:"
+          - textbox "EN91" [ref=e18]
+      - generic [ref=e19]:
+        - heading "DISPLAY OPTIONS" [level=3] [ref=e20]
+        - generic [ref=e21] [cursor=pointer]:
+          - checkbox "COLOR BY BAND" [ref=e22]
+          - generic [ref=e23]: COLOR BY BAND
+        - generic [ref=e24] [cursor=pointer]:
+          - checkbox "BRIGHTER MAP (JAY MODE)" [ref=e25]
+          - generic [ref=e26]: BRIGHTER MAP (JAY MODE)
+        - generic [ref=e27] [cursor=pointer]:
+          - checkbox "SHOW FIELDS" [checked] [ref=e28]: ✓
+          - generic [ref=e29]: SHOW FIELDS
+        - generic [ref=e30] [cursor=pointer]:
+          - checkbox "FIELD LABELS" [checked] [ref=e31]: ✓
+          - generic [ref=e32]: FIELD LABELS
+        - button "📷 SAVE SCREENSHOT (BETA)" [disabled] [ref=e33]
+      - generic [ref=e34]:
+        - heading "STATISTICS" [level=3] [ref=e35]
+        - generic [ref=e36]:
+          - generic [ref=e37]: "TOTAL CONTACTS:"
+          - generic [ref=e38]: "0"
+        - generic [ref=e39]:
+          - generic [ref=e40]: "UNIQUE GRIDS:"
+          - generic [ref=e41]: "0"
+        - generic [ref=e42]:
+          - generic [ref=e43]: "COUNTRIES:"
+          - generic [ref=e44]: "0"
+        - button "📈 VIEW STATS" [disabled] [ref=e45]
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic:
+          - generic:
+            - img
+        - generic:
+          - generic [ref=e48]:
+            - button "Zoom in" [ref=e49] [cursor=pointer]: +
+            - button "Zoom out" [ref=e50] [cursor=pointer]: −
+          - generic [ref=e51]:
+            - link "Leaflet" [ref=e52] [cursor=pointer]:
+              - /url: https://leafletjs.com
+              - img [ref=e53]
+              - text: Leaflet
+            - text: "| ©"
+            - link "OpenStreetMap" [ref=e57] [cursor=pointer]:
+              - /url: https://www.openstreetmap.org/copyright
+  - contentinfo [ref=e58]:
+    - generic [ref=e59]: READY FOR DATA INPUT
+    - generic [ref=e60]: GRID VISUALIZER v0.50
+```

@@ -76,4 +76,13 @@ test.describe('Vibe Landing Page', () => {
     
     await expect(page.locator('.section-title')).toHaveText('=== AVAILABLE SYSTEMS ===');
   });
+  
+  test('footer elements are present', async () => {
+    const landingPage = createLandingPage(page);
+    await landingPage.goto('/');
+    
+    const footer = page.locator('.footer');
+    await expect(footer).toBeVisible();
+    await expect(footer.locator('.footer-text').first()).toContainText('HAM RADIO');
+  });
 });

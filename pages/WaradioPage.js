@@ -150,6 +150,14 @@ class WaradioPage extends BasePage {
     return this;
   }
 
+  async disableRealTimeMode() {
+    const checkbox = this.getRealTimeCheckbox();
+    if (await checkbox.isChecked()) {
+      await checkbox.click();
+    }
+    return this;
+  }
+
   async clickPlay() {
     await this.getPlayButton().click();
     return this;

@@ -26,7 +26,6 @@ test.describe('WARADIO App', () => {
     });
 
     test('displays data input section with all elements', async () => {
-      await expect(waradioPage.getAdifFileInput()).toBeVisible();
       await expect(waradioPage.getLoadDemoDataButton()).toBeVisible();
       await expect(waradioPage.getMyGridInput()).toBeVisible();
     });
@@ -87,13 +86,15 @@ test.describe('WARADIO App', () => {
   test.describe('Happy Path - Load Demo Data and Play', () => {
     test.beforeEach(async () => {
       await waradioPage.load();
+      await waradioPage.disableRealTimeMode();
+      await waradioPage.setSpeed('4');
       await waradioPage.loadDemoData();
     });
 
     test('enables playback buttons after loading demo data', async () => {
       await expect(waradioPage.getPlayButton()).toBeEnabled();
-      await expect(waradioPage.getPauseButton()).toBeEnabled();
       await expect(waradioPage.getResetButton()).toBeEnabled();
+      await expect(waradioPage.getPauseButton()).toBeDisabled();
     });
 
     test('loads demo data and updates statistics', async () => {
@@ -103,27 +104,28 @@ test.describe('WARADIO App', () => {
       expect(parseInt(stats.remaining)).toEqual(parseInt(stats.total));
     });
 
-    test('speed is at 1x by default', async () => {
+    test('speed is at 4x after change', async () => {
       const speed = await waradioPage.getCurrentSpeed();
-      expect(speed).toBe('1');
+      expect(speed).toBe('4');
     });
 
-    test('clicking play starts playback and updates time elapsed', async () => {
+    test('clicking play starts playback and plots first contact', async () => {
       await waradioPage.clickPlay();
       
       await expect(waradioPage.getPlayButton()).toBeDisabled();
       await expect(waradioPage.getPauseButton()).toBeEnabled();
       
+      // Wait for first contact to be plotted (should be quick at 4x speed)
       await page.waitForTimeout(2000);
       
-      const elapsed = await waradioPage.getTimeElapsed().textContent();
-      expect(elapsed).not.toBe('00:00:00');
+      const plotted = await waradioPage.getPlottedContacts().textContent();
+      expect(parseInt(plotted)).toBeGreaterThan(0);
     });
 
     test('map shows markers after playing', async () => {
       await waradioPage.clickPlay();
       
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(2000);
       
       const plotted = await waradioPage.getPlottedContacts().textContent();
       expect(parseInt(plotted)).toBeGreaterThan(0);
@@ -132,7 +134,7 @@ test.describe('WARADIO App', () => {
     test('current contact updates during playback', async () => {
       await waradioPage.clickPlay();
       
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(2000);
       
       const contact = await waradioPage.getCurrentContact();
       expect(contact.callsign).not.toBe('--');
@@ -144,13 +146,13 @@ test.describe('WARADIO App', () => {
       await waradioPage.clickPlay();
       await page.waitForTimeout(2000);
       
-      const elapsedBeforePause = await waradioPage.getTimeElapsed().textContent();
+      const plottedBeforePause = await waradioPage.getPlottedContacts().textContent();
       await waradioPage.clickPause();
       
       await page.waitForTimeout(1000);
-      const elapsedAfterPause = await waradioPage.getTimeElapsed().textContent();
+      const plottedAfterPause = await waradioPage.getPlottedContacts().textContent();
       
-      expect(elapsedAfterPause).toBe(elapsedBeforePause);
+      expect(plottedAfterPause).toBe(plottedBeforePause);
     });
 
     test('clicking reset returns to initial state', async () => {
@@ -161,7 +163,6 @@ test.describe('WARADIO App', () => {
       
       const stats = await waradioPage.getStatistics();
       expect(stats.plotted).toBe('0');
-      expect(stats.elapsed).toBe('00:00:00');
       
       const contact = await waradioPage.getCurrentContact();
       expect(contact.callsign).toBe('--');

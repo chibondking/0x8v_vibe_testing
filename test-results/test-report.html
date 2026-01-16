@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results Report - 0x8v_vibe_testing</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; background: #1a1a2e; color: #eee; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00ff88; border-bottom: 2px solid #00ff88; padding-bottom: 10px; }
+        .summary { display: flex; gap: 40px; margin: 30px 0; }
+        .stat { text-align: center; padding: 20px; background: #16213e; border-radius: 8px; min-width: 150px; }
+        .stat-value { font-size: 48px; font-weight: bold; }
+        .stat-label { color: #888; margin-top: 5px; }
+        .passed { color: #00ff88; }
+        .failed { color: #ff4757; }
+        .skipped { color: #ffa502; }
+        .total { color: #70a1ff; }
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #16213e; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #0f3460; }
+        th { background: #0f3460; color: #00ff88; }
+        tr:hover { background: #1f4068; }
+        .status { padding: 4px 12px; border-radius: 4px; font-weight: bold; }
+        .status-passed { background: #00ff8833; color: #00ff88; }
+        .status-failed { background: #ff475733; color: #ff4757; }
+        .status-skipped { background: #ffa50233; color: #ffa502; }
+        .suite { margin-top: 40px; }
+        .suite h2 { color: #70a1ff; margin-bottom: 15px; }
+        .timestamp { color: #666; font-size: 14px; margin-top: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Results Report</h1>
+        <p>Repository: chibondking/0x8v_vibe_testing</p>
+        
+        <div class="summary">
+            <div class="stat">
+                <div class="stat-value total">28</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value passed">28</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value failed">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value skipped">0</div>
+                <div class="stat-label">Skipped</div>
+            </div>
+        </div>
+
+        <div class="suite">
+            <h2>Vibe Landing Page Tests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>has correct heading and status</td><td><span class="status status-passed">PASSED</span></td><td>~1s</td></tr>
+                    <tr><td>has all app cards with correct links</td><td><span class="status status-passed">PASSED</span></td><td>~0.7s</td></tr>
+                    <tr><td>aria snapshot has expected structure</td><td><span class="status status-passed">PASSED</span></td><td>~0.6s</td></tr>
+                    <tr><td>all app links are accessible</td><td><span class="status status-passed">PASSED</span></td><td>~0.6s</td></tr>
+                    <tr><td>section titles are visible</td><td><span class="status status-passed">PASSED</span></td><td>~0.6s</td></tr>
+                    <tr><td>footer elements are present</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="suite">
+            <h2>WARADIO App Tests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>displays WARadio header and system status</td><td><span class="status status-passed">PASSED</span></td><td>~1s</td></tr>
+                    <tr><td>displays data input section with all elements</td><td><span class="status status-passed">PASSED</span></td><td>~0.8s</td></tr>
+                    <tr><td>displays playback controls</td><td><span class="status status-passed">PASSED</span></td><td>~0.7s</td></tr>
+                    <tr><td>speed defaults to 1x</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>checkboxes have correct default states</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>playback buttons are disabled initially</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>displays statistics section</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>displays current contact section</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>displays map with band legend</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>band legend contains all amateur radio bands</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>enables playback buttons after loading demo data</td><td><span class="status status-passed">PASSED</span></td><td>~1s</td></tr>
+                    <tr><td>loads demo data and updates statistics</td><td><span class="status status-passed">PASSED</span></td><td>~0.8s</td></tr>
+                    <tr><td>speed is at 1x by default</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                    <tr><td>clicking play starts playback and updates time elapsed</td><td><span class="status status-passed">PASSED</span></td><td>~2s</td></tr>
+                    <tr><td>map shows markers after playing</td><td><span class="status status-passed">PASSED</span></td><td>~3s</td></tr>
+                    <tr><td>current contact updates during playback</td><td><span class="status status-passed">PASSED</span></td><td>~3s</td></tr>
+                    <tr><td>clicking pause stops time elapsed</td><td><span class="status status-passed">PASSED</span></td><td>~3s</td></tr>
+                    <tr><td>clicking reset returns to initial state</td><td><span class="status status-passed">PASSED</span></td><td>~2s</td></tr>
+                    <tr><td>can change playback speed</td><td><span class="status status-passed">PASSED</span></td><td>~0.5s</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="suite">
+            <h2>Broken Link Tests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>WARADIO - should have no broken links</td><td><span class="status status-passed">PASSED</span></td></tr>
+                    <tr><td>GRID - should have no broken links</td><td><span class="status status-passed">PASSED</span></td></tr>
+                    <tr><td>LIVE - should have no broken links</td><td><span class="status status-passed">PASSED</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="timestamp">Generated on 2026-01-16T20:12:00Z</p>
+    </div>
+</body>
+</html>

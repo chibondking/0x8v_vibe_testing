@@ -184,12 +184,16 @@ class WaradioPage extends BasePage {
   }
 
   async waitForPlaybackEnabled() {
-    await this.getPlayButton().waitFor({ state: 'visible', timeout: 5000 });
-    const isDisabled = await this.getPlayButton().getAttribute('disabled');
-    if (isDisabled === null) {
+    try {
+      await this.page.waitForFunction(() => {
+        const playBtn = document.getElementById('btn-play');
+        return playBtn && !playBtn.disabled;
+      }, { timeout: 15000 });
       return true;
+    } catch (error) {
+      console.error('Timeout waiting for playback to be enabled');
+      return false;
     }
-    return false;
   }
 
   async getStatistics() {

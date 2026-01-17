@@ -98,17 +98,22 @@ To add/remove apps, edit the `apps` array in `config/index.js`.
 ## Running Tests
 
 ```bash
-npm test                    # Run all tests
-npm run test:fast           # Run tests excluding stress tests (faster)
+npm test                    # Run all tests (parallel, fast)
+npm run test:fast           # Run tests excluding stress tests
 npm run test:stress         # Run only stress tests
-npm run test:playwright     # Run Playwright tests with assertions
-npm run test:vibe           # Run only vibe page tests
-npm run test:broken-links   # Run broken links check
-npm run test:headed         # Run tests in headed mode
-npm run test:waradio        # Run WARADIO tests
-npm run test:grid           # Run GRID tests
-npm run test:live           # Run LIVE tests
+npm run test:html           # Run tests with HTML report
+npm run test:ci             # Run tests with HTML report (CI mode)
 ```
+
+### HTML Report
+
+HTML reports are generated when `HTML_REPORT=1` or `CI=1` is set:
+```bash
+npm run test:html           # Generates playwright-report/index.html
+CI=1 npm test              # Also generates HTML report
+```
+
+The HTML reporter disables parallel execution for proper report generation, so it runs slower than the default line reporter.
 
 ### Stress Tests
 

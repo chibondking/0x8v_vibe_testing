@@ -13,7 +13,9 @@
     "test:headed": "playwright test --headed",
     "test:waradio": "playwright test tests/waradio-*.spec.ts",
     "test:grid": "playwright test tests/grid*.spec.ts",
-    "test:live": "playwright test tests/live.spec.ts"
+    "test:live": "playwright test tests/live.spec.ts",
+    "test:html": "HTML_REPORT=1 playwright test",
+    "test:ci": "CI=1 npm test"
   },
   "keywords": [],
   "author": "",

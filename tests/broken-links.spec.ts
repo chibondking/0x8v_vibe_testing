@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+const { getAppUrl, CONFIG } = require('../config');
 
 interface LinkInfo {
   url: string;
@@ -34,9 +35,9 @@ async function checkLinks(page: any, links: LinkInfo[]): Promise<{ url: string; 
 
 test.describe('Broken Link Tests', () => {
   const apps = [
-    { name: 'WARADIO', url: 'https://waradio.0x8v.io' },
-    { name: 'GRID', url: 'https://grid.0x8v.io' },
-    { name: 'LIVE', url: 'https://live.0x8v.io' },
+    { name: 'WARADIO', url: getAppUrl('waradio') },
+    { name: 'GRID', url: getAppUrl('grid') },
+    { name: 'LIVE', url: getAppUrl('live') },
   ];
 
   for (const app of apps) {
@@ -81,12 +82,12 @@ test.describe('Broken Link Tests', () => {
   }
 
   test('main landing page should have valid links to all apps', async ({ page }) => {
-    await page.goto('https://vibe.0x8v.io', { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto(CONFIG.baseUrl, { waitUntil: 'networkidle', timeout: 30000 });
     
     const mainLinks = [
-      { url: 'https://waradio.0x8v.io', name: 'WARADIO' },
-      { url: 'https://grid.0x8v.io', name: 'GRID' },
-      { url: 'https://live.0x8v.io', name: 'LIVE' },
+      { url: getAppUrl('waradio'), name: 'WARADIO' },
+      { url: getAppUrl('grid'), name: 'GRID' },
+      { url: getAppUrl('live'), name: 'LIVE' },
     ];
     
     for (const link of mainLinks) {

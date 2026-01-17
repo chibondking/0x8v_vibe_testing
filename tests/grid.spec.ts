@@ -12,6 +12,7 @@
 
 const { test, expect, chromium } = require('@playwright/test');
 const path = require('path');
+const { getAppUrl } = require('../config');
 
 /**
  * GridPage - Page Object Model for GRID Square Visualizer
@@ -19,7 +20,7 @@ const path = require('path');
 class GridPage {
   constructor(page) {
     this.page = page;
-    this.appUrl = 'https://grid.0x8v.io';
+    this.appUrl = getAppUrl('grid');
   }
 
   async load() {

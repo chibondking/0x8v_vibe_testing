@@ -1,10 +1,11 @@
 const BasePage = require('./BasePage');
+const { getAppUrl } = require('../config');
 
 class LivePage extends BasePage {
   constructor(page) {
-    super(page, 'https://live.0x8v.io');
+    super(page, getAppUrl('live'));
     this.appName = 'live';
-    this.appUrl = 'https://live.0x8v.io';
+    this.appUrl = getAppUrl('live');
   }
 
   async load() {

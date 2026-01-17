@@ -1,5 +1,9 @@
+const getBaseUrl = () => process.env.BASE_URL || 'https://vibe.0x8v.io';
+const getDomain = () => process.env.DOMAIN || '0x8v.io';
+
 const CONFIG = {
-  baseUrl: 'https://vibe.0x8v.io',
+  baseUrl: getBaseUrl(),
+  domain: getDomain(),
   apps: [
     { name: 'live', path: '/', description: 'FT8 Live Map' },
     { name: 'grid', path: '/', description: 'Grid Square Visualizer' },
@@ -12,7 +16,7 @@ const CONFIG = {
 };
 
 function getAppUrl(appName) {
-  return `https://${appName}.0x8v.io`;
+  return `https://${appName}.${CONFIG.domain}`;
 }
 
 function getLandingPageUrl() {

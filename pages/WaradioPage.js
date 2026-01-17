@@ -1,10 +1,11 @@
 const BasePage = require('./BasePage');
+const { getAppUrl } = require('../config');
 
 class WaradioPage extends BasePage {
   constructor(page) {
-    super(page, 'https://waradio.0x8v.io');
+    super(page, getAppUrl('waradio'));
     this.appName = 'waradio';
-    this.appUrl = 'https://waradio.0x8v.io';
+    this.appUrl = getAppUrl('waradio');
   }
 
   async load() {

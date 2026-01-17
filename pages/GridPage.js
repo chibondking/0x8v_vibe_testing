@@ -1,10 +1,11 @@
 const BasePage = require('./BasePage');
+const { getAppUrl } = require('../config');
 
 class GridPage extends BasePage {
   constructor(page) {
-    super(page, 'https://grid.0x8v.io');
+    super(page, getAppUrl('grid'));
     this.appName = 'grid';
-    this.appUrl = 'https://grid.0x8v.io';
+    this.appUrl = getAppUrl('grid');
   }
 
   async load() {

@@ -51,9 +51,9 @@ test.describe('Vibe Landing Page', () => {
     expect(snapshot).toContain('WARADIO');
     expect(snapshot).toContain('GRID');
     expect(snapshot).toContain('LIVE');
-    expect(snapshot).toContain('https://waradio.0x8v.io');
-    expect(snapshot).toContain('https://grid.0x8v.io');
-    expect(snapshot).toContain('https://live.0x8v.io');
+    expect(snapshot).toContain(getAppUrl('waradio'));
+    expect(snapshot).toContain(getAppUrl('grid'));
+    expect(snapshot).toContain(getAppUrl('live'));
   });
   
   test('all app links are accessible', async () => {

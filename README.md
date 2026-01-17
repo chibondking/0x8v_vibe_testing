@@ -1,49 +1,93 @@
-# Playwright Link Tests for 0x8v.io
+# VIBE Test Suite
 
-This project contains automated tests to check for broken links on the 0x8v.io website and its associated applications.
+Automated tests for KM8V's VIBE-coded amateur radio applications.
+
+**A battle of the bots.**
+
+## Overview
+
+Comprehensive Playwright test suite covering:
+- **VIBE** - Landing page and app navigation
+- **WARADIO** - ADIF Log Visualizer (playback, statistics, map)
+- **GRID** - Grid Square Visualizer (demo data, toggles, stats)
+- **LIVE** - FT8 Live Map (real-time spots, filters)
 
 ## Architecture
 
-Uses **Page Object Model (POM)** pattern for reusability and maintainability.
+Uses **Page Object Model (POM)** pattern with centralized URL configuration.
 
 ```
 config/
-  index.js           # Centralized configuration
+  index.js           # Centralized configuration with env var support
 pages/
   BasePage.js        # Base page object with common methods
-  LandingPage.js     # Page object for landing pages
-  AppPage.js         # Page object for application pages
+  LandingPage.js     # Page object for VIBE landing page
+  AppPage.js         # Generic app page object
   WaradioPage.js     # Page object for WARADIO ADIF Log Visualizer
   GridPage.js        # Page object for GRID Square Visualizer
   LivePage.js        # Page object for LIVE FT8 Live Map
-  index.js           # Page factory
+  index.js           # Page factory (create*Page functions)
 tests/
-  broken-links.test.js  # Legacy JS test for broken links
-  vibe.spec.ts          # Playwright test with assertions
-  live.spec.ts          # Playwright tests for LIVE FT8 Live Map
-  snapshots/            # Test snapshots
+  vibe.spec.ts       # Landing page tests
+  live.spec.ts       # LIVE app tests
+  grid*.spec.ts      # GRID app tests (initial, happy, edge, uiux)
+  waradio*.spec.ts   # WARADIO app tests (initial, playback, etc.)
+  broken-links.spec.ts # HTTP link verification
+playwright.config.ts # Playwright config with env var support
 ```
+
+### Configuration Pattern
+
+All URLs centralized via `config/index.js` and `playwright.config.ts`:
+
+```javascript
+const { getAppUrl } = require('./config');
+const url = getAppUrl('waradio'); // Uses env vars or defaults
+```
+
+Environment variables:
+- `BASE_URL` - Landing page URL (default: `https://vibe.0x8v.io`)
+- `DOMAIN` - App domain (default: `0x8v.io`)
 
 ## Configuration
 
 All URLs and apps are configured in `config/index.js`:
 
 ```javascript
-CONFIG = {
-  baseUrl: 'https://vibe.0x8v.io',
+const CONFIG = {
+  baseUrl: process.env.BASE_URL || 'https://vibe.0x8v.io',
+  domain: process.env.DOMAIN || '0x8v.io',
   apps: [
     { name: 'live', path: '/', description: 'FT8 Live Map' },
     { name: 'grid', path: '/', description: 'Grid Square Visualizer' },
     { name: 'waradio', path: '/', description: 'ADIF Log Visualizer' },
   ],
-  skipPatterns: {
-    anchors: ['#'],
-    externalDomains: ['leafletjs.com', 'openstreetmap.org', 'carto.com'],
-  },
 };
 ```
 
-To add/remove apps, simply edit the `apps` array in `config/index.js`.
+### Environment Variables
+
+Override URLs via environment variables:
+
+```bash
+# Run tests against production (default)
+npm test
+
+# Run tests against staging
+BASE_URL="https://staging-vibe.example.com" DOMAIN="example.com" npm test
+
+# Override specific settings
+export BASE_URL="https://vibe.local"
+export DOMAIN="localhost:3000"
+npm test
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BASE_URL` | `https://vibe.0x8v.io` || `DOMAIN Landing page URL |
+` | `0x8v.io` | Domain for app URLs (e.g., `waradio.{DOMAIN}`) |
+
+To add/remove apps, edit the `apps` array in `config/index.js`.
 
 ## Applications Tested
 

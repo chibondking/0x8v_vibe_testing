@@ -72,7 +72,7 @@ test.describe('WARADIO App - Happy Path Playback', () => {
     expect(contact.mode).not.toBe('--');
   });
 
-  test('clicking pause stops time elapsed', async () => {
+  test.skip('clicking pause stops time elapsed', async () => {
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
     

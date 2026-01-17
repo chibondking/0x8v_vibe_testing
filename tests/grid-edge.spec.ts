@@ -48,8 +48,8 @@ test.describe('GRID App - Edge Cases', () => {
   test('handles empty ADIF file selection gracefully', async ({ page }) => {
     const fileInput = gridPage.getAdifFileInput();
     await fileInput.setInputFiles([]);
-    const fileInfo = await gridPage.getFileInfo();
-    await expect(fileInfo).toBeHiddenOrEmpty();
+    const fileInfo = gridPage.getFileInfo();
+    await expect(fileInfo).toHaveText('');
   });
 
   test('validates grid square format', async ({ page }) => {
@@ -75,10 +75,10 @@ test.describe('GRID App - Edge Cases', () => {
   test('maintains state after statistics popup open/close', async ({ page }) => {
     await gridPage.loadDemoData();
     await page.waitForTimeout(500);
-    await gridPage.openStats();
-    await gridPage.closeStats();
+    await gridPage.clickViewStats();
+    await gridPage.closeStatsPopup();
     const statsPopup = gridPage.getStatsPopup();
-    await expect(statsPopup).toBeHidden();
+    await expect(statsPopup).toHaveClass(/hidden/);
   });
 
   test('handles grid input with lowercase letters', async ({ page }) => {

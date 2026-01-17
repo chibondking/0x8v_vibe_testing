@@ -29,6 +29,10 @@ class GridPage extends BasePage {
     return this.page.locator('.header-wopr-lights');
   }
 
+  getDataInputSection() {
+    return this.page.locator('.control-panel .panel-section').first();
+  }
+
   getAdifFileInput() {
     return this.page.locator('#adif-file');
   }
@@ -43,6 +47,10 @@ class GridPage extends BasePage {
 
   getMyGridInput() {
     return this.page.locator('#my-grid');
+  }
+
+  getDisplayOptionsSection() {
+    return this.page.locator('.panel-section').nth(1);
   }
 
   getColorByBandCheckbox() {
@@ -65,8 +73,12 @@ class GridPage extends BasePage {
     return this.page.locator('#btn-screenshot');
   }
 
-  getViewStatsButton() {
-    return this.page.locator('#btn-stats');
+  getFfmaButtonContainer() {
+    return this.page.locator('#ffma-button-container');
+  }
+
+  getStatisticsSection() {
+    return this.page.locator('.panel-section').nth(2);
   }
 
   getTotalContacts() {
@@ -81,32 +93,74 @@ class GridPage extends BasePage {
     return this.page.locator('#stat-countries');
   }
 
-  getMap() {
-    return this.page.locator('#map');
-  }
-
-  getLoadingOverlay() {
-    return this.page.locator('#loading-overlay');
-  }
-
-  getErrorPopup() {
-    return this.page.locator('#error-popup');
+  getViewStatsButton() {
+    return this.page.locator('#btn-stats');
   }
 
   getStatsPopup() {
     return this.page.locator('#stats-popup');
   }
 
-  getStatusLeft() {
+  getCloseStatsButton() {
+    return this.page.locator('#btn-close-stats');
+  }
+
+  getMap() {
+    return this.page.locator('#map');
+  }
+
+  getMapContainer() {
+    return this.page.locator('.map-container');
+  }
+
+  getLoadingOverlay() {
+    return this.page.locator('#loading-overlay');
+  }
+
+  getLoadingMessage() {
+    return this.page.locator('#loading-message');
+  }
+
+  getErrorPopup() {
+    return this.page.locator('#error-popup');
+  }
+
+  getErrorText() {
+    return this.page.locator('.error-text');
+  }
+
+  getStatusBarLeft() {
     return this.page.locator('#status-left');
   }
 
-  getStatusRight() {
+  getStatusBarRight() {
     return this.page.locator('#status-right');
+  }
+
+  getStatusLeft() {
+    return this.getStatusBarLeft();
+  }
+
+  getStatusRight() {
+    return this.getStatusBarRight();
+  }
+
+  getMobileControls() {
+    return this.page.locator('.mobile-controls');
+  }
+
+  getMobileDemoButton() {
+    return this.page.locator('#btn-demo-mobile');
   }
 
   async loadDemoData() {
     await this.getLoadDemoDataButton().click();
+    await this.waitForDataLoaded();
+    return this;
+  }
+
+  async loadDemoDataMobile() {
+    await this.getMobileDemoButton().click();
     await this.waitForDataLoaded();
     return this;
   }
@@ -122,6 +176,57 @@ class GridPage extends BasePage {
       console.error('Timeout waiting for data to load');
       return false;
     }
+  }
+
+  async getStatistics() {
+    return {
+      total: await this.getTotalContacts().textContent(),
+      grids: await this.getUniqueGrids().textContent(),
+      countries: await this.getCountries().textContent(),
+    };
+  }
+
+  async toggleBrightMap() {
+    await this.getBrightMapCheckbox().click();
+    return this;
+  }
+
+  async toggleColorByBand() {
+    await this.getColorByBandCheckbox().click();
+    return this;
+  }
+
+  async openStats() {
+    await this.getViewStatsButton().click();
+    await this.page.waitForSelector('#stats-popup:not(.hidden)');
+    return this;
+  }
+
+  async closeStats() {
+    await this.getCloseStatsButton().click();
+    await this.page.waitForFunction(() => {
+      const el = document.getElementById('stats-popup');
+      return el && el.classList.contains('hidden');
+    }, { timeout: 5000 });
+    return this;
+  }
+
+  async setMyGrid(grid) {
+    await this.getMyGridInput().clear();
+    await this.getMyGridInput().fill(grid);
+    return this;
+  }
+
+  async getGridSquares() {
+    return await this.page.locator('.grid-square-rect');
+  }
+
+  async getGridSquareCount() {
+    return await this.page.locator('.grid-square-rect').count();
+  }
+
+  async getFieldLabels() {
+    return await this.page.locator('.field-label');
   }
 
   async clickScreenshot() {
@@ -140,7 +245,10 @@ class GridPage extends BasePage {
     const isHidden = await popup.evaluate(el => el.classList.contains('hidden'));
     if (!isHidden) {
       await this.page.locator('#btn-close-stats').click();
-      await this.page.waitForSelector('#stats-popup.hidden');
+      await this.page.waitForFunction(() => {
+        const el = document.getElementById('stats-popup');
+        return el && el.classList.contains('hidden');
+      }, { timeout: 5000 });
     }
     return this;
   }
@@ -149,27 +257,9 @@ class GridPage extends BasePage {
     return await this.getColorByBandCheckbox().isChecked();
   }
 
-  async toggleColorByBand() {
-    await this.getColorByBandCheckbox().click();
-    return this;
-  }
-
-  async toggleBrightMap() {
-    await this.getBrightMapCheckbox().click();
-    return this;
-  }
-
   async toggleShowFields() {
     await this.getShowFieldsCheckbox().click();
     return this;
-  }
-
-  async getStatistics() {
-    return {
-      total: await this.getTotalContacts().textContent(),
-      grids: await this.getUniqueGrids().textContent(),
-      countries: await this.getCountries().textContent(),
-    };
   }
 
   async getMapBounds() {

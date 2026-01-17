@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   reporter: [
-    ['list', { printSteps: true }],
+    ['line', { printSteps: true }],
     ['html', { outputFolder: './playwright-report', open: 'never' }],
   ],
   outputDir: './test-results/html-report',

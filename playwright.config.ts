@@ -5,6 +5,7 @@ const domain = process.env.DOMAIN || '0x8v.io';
 
 export default defineConfig({
   testDir: './tests',
+  testMatch: '**/*.spec.ts',
   timeout: 60000,
   retries: 0,
   use: {
@@ -18,8 +19,8 @@ export default defineConfig({
     },
   ],
   reporter: [
-    ['line', { printSteps: true }],
-    ['html', { outputFolder: './playwright-report', open: 'never' }],
+    ['line'],
+    ['html', { outputFolder: './playwright-report' }],
   ],
   outputDir: './test-results/html-report',
 });

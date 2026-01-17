@@ -84,8 +84,8 @@ npm test
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `BASE_URL` | `https://vibe.0x8v.io` || `DOMAIN Landing page URL |
-` | `0x8v.io` | Domain for app URLs (e.g., `waradio.{DOMAIN}`) |
+| `BASE_URL` | `https://vibe.0x8v.io` | Landing page URL |
+| `DOMAIN` | `0x8v.io` | Domain for app URLs (e.g., `waradio.{DOMAIN}`) |
 
 To add/remove apps, edit the `apps` array in `config/index.js`.
 
@@ -99,6 +99,8 @@ To add/remove apps, edit the `apps` array in `config/index.js`.
 
 ```bash
 npm test                    # Run all tests
+npm run test:fast           # Run tests excluding stress tests (faster)
+npm run test:stress         # Run only stress tests
 npm run test:playwright     # Run Playwright tests with assertions
 npm run test:vibe           # Run only vibe page tests
 npm run test:broken-links   # Run broken links check
@@ -106,6 +108,24 @@ npm run test:headed         # Run tests in headed mode
 npm run test:waradio        # Run WARADIO tests
 npm run test:grid           # Run GRID tests
 npm run test:live           # Run LIVE tests
+```
+
+### Stress Tests
+
+Stress tests are tagged with `@stress` and test edge cases:
+- Rapid navigation and window resizing
+- Concurrent operations
+- Resource exhaustion
+- Unusual interaction patterns
+
+**Run only stress tests:**
+```bash
+npm run test:stress
+```
+
+**Skip stress tests for faster feedback:**
+```bash
+npm run test:fast
 ```
 
 ## Test Reports

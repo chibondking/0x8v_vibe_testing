@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test && node tests/broken-links.test.js",
+    "test:fast": "playwright test --grep-invert \"@stress\" && node tests/broken-links.test.js",
+    "test:stress": "playwright test --grep \"@stress\"",
     "test:playwright": "playwright test",
     "test:broken-links": "node tests/broken-links.test.js",
     "test:vibe": "playwright test tests/vibe.spec.ts",

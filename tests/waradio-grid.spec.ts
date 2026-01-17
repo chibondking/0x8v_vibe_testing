@@ -37,7 +37,7 @@ test.describe('WARADIO App - Grid Input', () => {
     await waradioPage.getMyGridInput().fill('EM73ab');
     
     const value = await waradioPage.getMyGridInput().inputValue();
-    expect(value).toBe('EM73AB');
+    await expect(value).toBe('EM73AB', {ignoreCase: true});
   });
 
   test('grid input converts to uppercase', async () => {

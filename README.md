@@ -64,6 +64,33 @@ npm run test:grid           # Run GRID tests
 npm run test:live           # Run LIVE tests
 ```
 
+## Test Reports
+
+Two reporters are configured for optimal visibility:
+
+### Terminal Output (List Reporter)
+Shows real-time progress with pass/fail indicators:
+```
+✓  1 [chromium] › tests/live.spec.ts:22:3 › LIVE App - Initial Load › displays LIVE header
+✓  2 [chromium] › tests/live.spec.ts:28:3 › LIVE App - Initial Load › displays timestamp
+```
+
+### HTML Report
+Interactive report generated in `playwright-report/index.html` after each run.
+
+**Features:**
+- Filter by status (passed, failed, skipped)
+- Filter by test suite
+- Search tests by name
+- View traces and screenshots
+- Single-page view for easy sharing
+
+Open with:
+```bash
+open playwright-report/index.html   # macOS
+xdg-open playwright-report/index.html  # Linux
+```
+
 ## Test Coverage by App
 
 ### WARADIO App (ADIF Log Visualizer)

@@ -14,6 +14,9 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  reporter: 'html',
+  reporter: [
+    ['list', { printSteps: true }],
+    ['html', { outputFolder: './playwright-report', open: 'never' }],
+  ],
   outputDir: './test-results/html-report',
 });

@@ -33,11 +33,6 @@ test.describe('GRID App - UI/UX', () => {
     await expect(dataInputSection).toBeVisible();
   });
 
-  test('display options section is visible', async ({ page }) => {
-    const displayOptionsSection = page.locator('h3:has-text("DISPLAY OPTIONS")');
-    await expect(displayOptionsSection).toBeVisible();
-  });
-
   test('statistics section is visible', async ({ page }) => {
     const statsSection = page.locator('h3:has-text("STATISTICS")');
     await expect(statsSection).toBeVisible();

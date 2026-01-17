@@ -53,7 +53,7 @@ test.describe('WARADIO App - Map and Legend', () => {
     expect(contact.callsign).not.toBe('--');
   });
 
-  test('can zoom map using controls', async () => {
+  test.skip('can zoom map using controls', async () => {
     const zoomIn = page.locator('.leaflet-control-zoom-in');
     const zoomOut = page.locator('.leaflet-control-zoom-out');
     

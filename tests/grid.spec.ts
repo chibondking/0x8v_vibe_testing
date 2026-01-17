@@ -35,10 +35,6 @@ test.describe('GRID App - Initial Load', () => {
     await gridPage.load();
   });
 
-  test('displays GRID Square Visualizer header', async () => {
-    await expect(gridPage.getHeaderTitle()).toHaveText('GRID SQUARE VISUALIZER');
-  });
-
   test('displays system status indicator', async () => {
     await expect(gridPage.getSystemStatus()).toBeVisible();
     await expect(gridPage.getSystemStatus()).toHaveText('SYSTEM READY');

@@ -15,11 +15,13 @@ pages/
   AppPage.js         # Page object for application pages
   WaradioPage.js     # Page object for WARADIO ADIF Log Visualizer
   GridPage.js        # Page object for GRID Square Visualizer
+  LivePage.js        # Page object for LIVE FT8 Live Map
   index.js           # Page factory
 tests/
   broken-links.test.js  # Legacy JS test for broken links
   vibe.spec.ts          # Playwright test with assertions
-  snapshots/              # Test snapshots
+  live.spec.ts          # Playwright tests for LIVE FT8 Live Map
+  snapshots/            # Test snapshots
 ```
 
 ## Configuration
@@ -59,6 +61,7 @@ npm run test:broken-links   # Run broken links check
 npm run test:headed         # Run tests in headed mode
 npm run test:waradio        # Run WARADIO tests
 npm run test:grid           # Run GRID tests
+npm run test:live           # Run LIVE tests
 ```
 
 ## Test Coverage by App
@@ -210,6 +213,39 @@ npm run test:grid           # Run GRID tests
 
 ---
 
+### LIVE App (FT8 Live Map)
+
+**Total: 19 tests**
+
+#### live.spec.ts (19 tests)
+
+**LIVE App - Initial Load (10 tests)**
+- **displays LIVE header and system status** - Verifies h1 title "LIVE HAMRADIO MAP" and system status indicator
+- **displays timestamp** - Timestamp display element is visible
+- **displays map container** - Leaflet map is visible
+- **displays mode filter buttons** - Mode filter buttons (ALL, FT8, FT4, WSPR, VARAC, JS8) are visible
+- **displays band filter buttons** - Band filter buttons (160m-2m) are visible
+- **displays display options section** - Color by band, bright map, draw lines checkboxes are visible
+- **displays live feed section** - CONNECT LIVE button is visible
+- **displays my call section** - My callsign input and HEARD ME button are visible
+- **displays zoom controls** - Zoom in/out buttons are visible
+- **page title is correct** - Title contains "Live Map"
+
+**LIVE App - Functionality (5 tests)**
+- **connect live button is clickable** - CONNECT LIVE button is enabled
+- **my call input accepts text** - Callsign input accepts and displays text
+- **mode filter has FT8 option** - FT8 mode filter button is visible
+- **band filter has 20m option** - 20m band filter button is visible
+- **heard me button is disabled initially** - HEARD ME button is disabled until callsign entered
+
+**LIVE App - UI/UX (4 tests)**
+- **page loads without JavaScript errors** - No JS errors in console
+- **footer status is visible** - Left and right status bar elements visible
+- **map is visible on mobile viewport** - Map visible on mobile (375x667)
+- **display options have correct default states** - Color by band and draw lines checked; bright map unchecked
+
+---
+
 ## Test Coverage
 
 ### vibe.spec.ts (Playwright with Assertions)
@@ -260,6 +296,20 @@ Page object for GRID Square Visualizer. Provides methods for:
 - **Statistics**: `getStatistics()`, `getTotalContacts()`, `getUniqueGrids()`, `getCountries()`, `openStats()`, `closeStats()`
 - **Map Elements**: `getMap()`, `getMapContainer()`, `getGridSquares()`, `getGridSquareCount()`, `getFieldLabels()`
 - **Actions**: `setMyGrid()`, `getScreenshotButton()`, `getViewStatsButton()`, `getStatsPopup()`
+
+### LivePage.js
+
+Page object for LIVE FT8 Live Map. Provides methods for:
+
+- **Navigation**: `load()`
+- **Header Elements**: `getHeaderTitle()`, `getSystemStatus()`, `getTimestampDisplay()`
+- **Map**: `getMap()`, `getZoomInButton()`, `getZoomOutButton()`
+- **Filters**: `getModeButtons()`, `getBandButtons()`, `clickModeButton()`, `clickBandButton()`
+- **Display Options**: `getColorByBandCheckbox()`, `getBrightMapCheckbox()`, `getClassicFormatCheckbox()`, `getShowLabelsCheckbox()`, `getDrawLinesCheckbox()`
+- **Live Feed**: `getConnectLiveButton()`, `getSpotCount()`, `getClearAllButton()`, `clickConnectLive()`, `clickClearAll()`, `waitForSpots()`
+- **My Call**: `getMyCallInput()`, `getHeardMeButton()`, `getHeardByMeButton()`, `setMyCall()`
+- **Location**: `getEnableLocationButton()`, `enableLocation()`
+- **Status**: `getStatusLeft()`, `getStatusRight()`
 
 ---
 

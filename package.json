@@ -8,7 +8,10 @@
     "test:playwright": "playwright test",
     "test:broken-links": "node tests/broken-links.test.js",
     "test:vibe": "playwright test tests/vibe.spec.ts",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "test:waradio": "playwright test tests/waradio-*.spec.ts",
+    "test:grid": "playwright test tests/grid*.spec.ts",
+    "test:live": "playwright test tests/live.spec.ts"
   },
   "keywords": [],
   "author": "",

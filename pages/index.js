@@ -2,6 +2,7 @@ const LandingPage = require('./LandingPage');
 const AppPage = require('./AppPage');
 const WaradioPage = require('./WaradioPage');
 const GridPage = require('./GridPage');
+const LivePage = require('./LivePage');
 const { getAppUrl, getLandingPageUrl } = require('../config');
 
 function createLandingPage(page) {
@@ -21,6 +22,10 @@ function createGridPage(page) {
   return new GridPage(page);
 }
 
+function createLivePage(page) {
+  return new LivePage(page);
+}
+
 function createPage(page, url) {
   if (url.includes('vibe.0x8v.io')) {
     return new LandingPage(page);
@@ -32,6 +37,10 @@ function createPage(page, url) {
   
   if (url.includes('grid.0x8v.io')) {
     return new GridPage(page);
+  }
+  
+  if (url.includes('live.0x8v.io')) {
+    return new LivePage(page);
   }
   
   const appMatch = url.match(/https?:\/\/(\w+)\.0x8v\.io/);
@@ -47,5 +56,6 @@ module.exports = {
   createAppPage,
   createWaradioPage,
   createGridPage,
+  createLivePage,
   createPage,
 };

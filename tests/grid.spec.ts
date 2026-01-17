@@ -23,7 +23,7 @@ class GridPage {
   }
 
   async load() {
-    await this.page.goto('/');
+    await this.page.goto(this.appUrl);
     return this;
   }
 

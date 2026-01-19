@@ -1,26 +1,27 @@
-const { test, expect, chromium } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const { createLandingPage } = require('../pages');
 const { getAppsConfig, getAppUrl, CONFIG } = require('../config');
+const { createTestSuite, closeBrowser } = require('./test-utils');
+const { MOBILE_VIEWPORT, TABLET_VIEWPORT, DESKTOP_VIEWPORT } = require('./assertions');
+
+const LARGE_VIEWPORT = { width: 2560, height: 1440 };
 
 /**
  * @typedef {import('../pages/LandingPage')} LandingPage
  */
 
+const vibeContext = createTestSuite({
+  pageName: 'Vibe',
+  createPageObject: createLandingPage,
+});
+
 test.describe('Vibe Landing Page', () => {
-  /** @type {import('@playwright/test').Page} */
-  let page;
-  
-  test.beforeAll(async () => {
-    const browser = await chromium.launch();
-    page = await browser.newPage();
-  });
-  
-  test.afterAll(async () => {
-    await page.close();
-  });
-  
+  test.beforeAll(vibeContext.beforeAll);
+  test.afterAll(vibeContext.afterAll);
+
   test('has correct heading and status', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     await expect(page.locator('h1.title')).toHaveText('HAMRAD INTERFACE');
@@ -28,7 +29,8 @@ test.describe('Vibe Landing Page', () => {
   });
   
   test('has all app cards with correct links', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     const appsConfig = getAppsConfig();
@@ -45,7 +47,8 @@ test.describe('Vibe Landing Page', () => {
   });
   
   test('aria snapshot has expected structure', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     const snapshot = await page.locator('body').ariaSnapshot();
@@ -62,7 +65,8 @@ test.describe('Vibe Landing Page', () => {
   });
   
   test('all app links are accessible', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     const appsConfig = getAppsConfig();
@@ -76,14 +80,16 @@ test.describe('Vibe Landing Page', () => {
   });
   
   test('section titles are visible', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     await expect(page.locator('.section-title')).toHaveText('=== AVAILABLE SYSTEMS ===');
   });
   
   test('footer elements are present', async () => {
-    const landingPage = createLandingPage(page);
+    const page = vibeContext.getPage();
+    const landingPage = vibeContext.getPageObject();
     await landingPage.goto('/');
     
     const footer = page.locator('.footer');
@@ -96,11 +102,12 @@ test.describe('Vibe Landing Page @stress', () => {
   let page;
 
   test.beforeAll(async () => {
-    page = await chromium.launch().then(browser => browser.newPage());
+    const { browser } = await require('./test-utils').createBrowser();
+    page = await browser.newPage();
   });
 
   test.afterAll(async () => {
-    await page.close();
+    if (page) await page.close();
   });
 
   test.beforeEach(async () => {
@@ -109,11 +116,11 @@ test.describe('Vibe Landing Page @stress', () => {
 
   test('handles rapid window resize events @stress', async () => {
     const sizes = [
-      { width: 375, height: 667 },
-      { width: 768, height: 1024 },
-      { width: 1920, height: 1080 },
+      MOBILE_VIEWPORT,
+      TABLET_VIEWPORT,
+      DESKTOP_VIEWPORT,
       { width: 414, height: 896 },
-      { width: 2560, height: 1440 },
+      LARGE_VIEWPORT,
     ];
 
     for (const size of sizes) {
@@ -156,9 +163,9 @@ test.describe('Vibe Landing Page @stress', () => {
 
   test('handles rapid visibility toggles @stress', async () => {
     await page.setViewportSize({ width: 0, height: 0 });
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.setViewportSize(DESKTOP_VIEWPORT);
+    await page.setViewportSize(MOBILE_VIEWPORT);
+    await page.setViewportSize(DESKTOP_VIEWPORT);
     
     await expect(page.locator('h1.title')).toBeVisible();
   });

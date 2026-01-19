@@ -4,8 +4,12 @@ const { createTestSuite } = require('./test-utils');
 const { MOBILE_VIEWPORT } = require('./assertions');
 
 /**
- * @typedef {import('../pages/GridPage')} GridPage
+ * @typedef {import('../pages/GridPage')} GridPageType
  */
+
+test.describe('GRID App - Edge Cases', () => {
+  /** @type {GridPageType} */
+  let gridPage;
 
 const gridContext = createTestSuite({
   pageName: 'GRID',

@@ -15,10 +15,23 @@ const vibeContext = createTestSuite({
   createPageObject: createLandingPage,
 });
 
-test.describe('Vibe Landing Page', () => {
-  test.beforeAll(vibeContext.beforeAll);
-  test.afterAll(vibeContext.afterAll);
+/**
+ * @typedef {import('../pages/LandingPage')} LandingPage
+ */
 
+test.describe('Vibe Landing Page', () => {
+  /** @type {import('@playwright/test').Page} */
+  let page;
+  
+  test.beforeAll(async () => {
+    const browser = await chromium.launch();
+    page = await browser.newPage();
+  });
+  
+  test.afterAll(async () => {
+    await page.close();
+  });
+  
   test('has correct heading and status', async () => {
     const page = vibeContext.getPage();
     const landingPage = vibeContext.getPageObject();

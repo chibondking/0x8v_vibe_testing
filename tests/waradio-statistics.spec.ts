@@ -1,160 +1,124 @@
-const { test, expect, chromium } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const { createWaradioPage } = require('../pages');
+const { createTestSuite } = require('./test-utils');
+
+const waradioContext = createTestSuite({
+  pageName: 'WARADIO',
+  createPageObject: createWaradioPage,
+});
 
 test.describe('WARADIO App - Statistics', () => {
-  let page;
-  let waradioPage;
-
-  test.beforeAll(async () => {
-    const browser = await chromium.launch();
-    page = await browser.newPage();
-    waradioPage = createWaradioPage(page);
-  });
-
-  test.afterAll(async () => {
-    await page.close();
-  });
-
+  test.beforeAll(waradioContext.beforeAll);
+  test.afterAll(waradioContext.afterAll);
   test.beforeEach(async () => {
-    await waradioPage.load();
+    await waradioContext.beforeEach();
+    const waradioPage = waradioContext.getPageObject();
     await waradioPage.disableRealTimeMode();
     await waradioPage.setSpeed('4');
     await waradioPage.loadDemoData();
-  }, 60000);
+  });
 
   test('total contacts shows correct count', async () => {
+    const waradioPage = waradioContext.getPageObject();
     const stats = await waradioPage.getStatistics();
     expect(parseInt(stats.total)).toBeGreaterThan(0);
   });
 
   test('plotted starts at 0', async () => {
-    const stats = await waradioPage.getStatistics();
-    expect(parseInt(stats.plotted)).toBe(0);
+    const waradioPage = waradioContext.getPageObject();
+    const plotted = await waradioPage.getPlottedContacts().textContent();
+    expect(parseInt(plotted)).toBe(0);
   });
 
   test('remaining equals total before playback', async () => {
+    const waradioPage = waradioContext.getPageObject();
     const stats = await waradioPage.getStatistics();
     expect(parseInt(stats.remaining)).toEqual(parseInt(stats.total));
   });
 
   test('plotted increases during playback', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    
     await page.waitForTimeout(2000);
-    
     const plotted = await waradioPage.getPlottedContacts().textContent();
     expect(parseInt(plotted)).toBeGreaterThan(0);
   });
 
   test('remaining decreases as contacts are plotted', async () => {
-    await waradioPage.loadDemoData();
-    
-    const beforeStats = await waradioPage.getStatistics();
-    const beforeRemaining = parseInt(beforeStats.remaining);
-    
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
+    const statsBefore = await waradioPage.getStatistics();
     await waradioPage.clickPlay();
-    
-    await page.waitForTimeout(3000);
-    
-    const afterStats = await waradioPage.getStatistics();
-    const afterRemaining = parseInt(afterStats.remaining);
-    
-    expect(afterRemaining).toBeLessThan(beforeRemaining);
+    await page.waitForTimeout(2000);
+    const statsAfter = await waradioPage.getStatistics();
+    expect(parseInt(statsAfter.remaining)).toBeLessThan(parseInt(statsBefore.remaining));
   });
 
   test('plotted + remaining equals total', async () => {
-    await waradioPage.clickPlay();
-    
-    await page.waitForTimeout(3000);
-    await waradioPage.clickPause();
-    
+    const waradioPage = waradioContext.getPageObject();
     const stats = await waradioPage.getStatistics();
-    const total = parseInt(stats.total);
-    const plotted = parseInt(stats.plotted);
-    const remaining = parseInt(stats.remaining);
-    
-    expect(plotted + remaining).toBeLessThanOrEqual(total);
+    expect(parseInt(stats.plotted) + parseInt(stats.remaining)).toEqual(parseInt(stats.total));
   });
 
   test('time elapsed updates during playback', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
+    const elapsedBefore = await waradioPage.getTimeElapsed().textContent();
     await waradioPage.clickPlay();
-    
     await page.waitForTimeout(2000);
-    
-    const elapsed = await waradioPage.getTimeElapsed().textContent();
-    
-    const timeParts = elapsed.split(':');
-    expect(timeParts.length).toBe(3);
-    
-    const seconds = parseInt(timeParts[2]);
-    expect(seconds).toBeGreaterThanOrEqual(0);
+    const elapsedAfter = await waradioPage.getTimeElapsed().textContent();
+    expect(elapsedAfter).not.toBe(elapsedBefore);
   });
 
   test('distance is calculated during playback', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    
-    await page.waitForTimeout(3000);
-    
+    await page.waitForTimeout(2000);
     const distance = await waradioPage.getContactDistance().textContent();
-    
-    if (distance !== '--') {
-      const distanceNum = parseFloat(distance);
-      expect(distanceNum).toBeGreaterThan(0);
-    }
+    expect(distance).not.toBe('--');
+    expect(parseFloat(distance.replace(/[^0-9.]/g, ''))).toBeGreaterThan(0);
   });
 
   test('reset clears plotted count', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    
     await page.waitForTimeout(2000);
-    await waradioPage.clickPause();
-    
-    const beforeReset = await waradioPage.getPlottedContacts().textContent();
-    expect(parseInt(beforeReset)).toBeGreaterThan(0);
-    
     await waradioPage.clickReset();
-    
-    const afterReset = await waradioPage.getPlottedContacts().textContent();
-    expect(parseInt(afterReset)).toBe(0);
+    const plotted = await waradioPage.getPlottedContacts().textContent();
+    expect(parseInt(plotted)).toBe(0);
   });
 
   test('reset clears remaining to total', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
+    const statsBefore = await waradioPage.getStatistics();
     await waradioPage.clickPlay();
-    
     await page.waitForTimeout(2000);
-    await waradioPage.clickPause();
-    
-    const total = await waradioPage.getTotalContacts().textContent();
-    
     await waradioPage.clickReset();
-    
-    const remaining = await waradioPage.getRemainingContacts().textContent();
-    expect(parseInt(remaining)).toEqual(parseInt(total));
+    const statsAfter = await waradioPage.getStatistics();
+    expect(parseInt(statsAfter.remaining)).toEqual(parseInt(statsBefore.total));
   });
 
   test('reset clears time elapsed', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    
     await page.waitForTimeout(2000);
-    await waradioPage.clickPause();
-    
-    const elapsed = await waradioPage.getTimeElapsed().textContent();
-    expect(elapsed).not.toBe('00:00:00');
-    
     await waradioPage.clickReset();
-    
-    const resetElapsed = await waradioPage.getTimeElapsed().textContent();
-    expect(resetElapsed).toBe('00:00:00');
+    const elapsed = await waradioPage.getTimeElapsed().textContent();
+    expect(elapsed).toBe('00:00:00');
   });
 
   test('statistics update in real-time during playback', async () => {
+    const waradioPage = waradioContext.getPageObject();
+    const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    
     const plotted1 = await waradioPage.getPlottedContacts().textContent();
-    await page.waitForTimeout(500);
-    
+    await page.waitForTimeout(1000);
     const plotted2 = await waradioPage.getPlottedContacts().textContent();
-    
-    expect(parseInt(plotted2)).toBeGreaterThanOrEqual(parseInt(plotted1));
+    expect(parseInt(plotted2)).toBeGreaterThan(parseInt(plotted1));
   });
 });

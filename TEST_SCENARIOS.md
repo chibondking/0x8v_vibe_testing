@@ -12,6 +12,7 @@ This document provides an overview of all test scenarios, what's covered, what's
 | LIVE | live.spec.ts | 35 | ✅ Complete (2 skipped) |
 | Broken Links | broken-links.spec.ts | 4 | ✅ Complete |
 
+**Total: ~258 tests (223 running, 35 skipped)**
 **Total: ~249 tests (218 running, 31 skipped)**
 
 ---
@@ -90,7 +91,6 @@ test.describe('Feature', () => {
     // Test implementation
   });
 });
-```
 
 **Available functions:**
 - `createBrowser(options)` - Launches browser with headless option
@@ -227,9 +227,9 @@ test('accepts valid formats', async () => {
 });
 ```
 
----
+### 2. Page Object Method Pattern
 
-## Best Practices
+Add methods to page objects for reusable functionality:
 
 ### 1. Use Test Utilities
 Always use `createTestSuite` for browser lifecycle management to reduce boilerplate.

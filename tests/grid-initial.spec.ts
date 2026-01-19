@@ -1,43 +1,49 @@
-const { test, expect, chromium } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const { createGridPage } = require('../pages');
+const { createTestSuite } = require('./test-utils');
+const {
+  assertHeaderAndStatus,
+  assertDataInputVisible,
+  assertFooterStatusVisible,
+  assertMapVisible,
+} = require('./assertions');
+
+/**
+ * @typedef {import('../pages/GridPage')} GridPage
+ */
+
+const gridContext = createTestSuite({
+  pageName: 'GRID',
+  createPageObject: createGridPage,
+});
 
 test.describe('GRID App - Initial Load', () => {
-  let page;
-  let gridPage;
-
-  test.beforeAll(async () => {
-    const browser = await chromium.launch();
-    page = await browser.newPage();
-    gridPage = createGridPage(page);
-  });
-
-  test.afterAll(async () => {
-    await page.close();
-  });
-
-  test.beforeEach(async () => {
-    await gridPage.load();
-  });
+  test.beforeAll(gridContext.beforeAll);
+  test.afterAll(gridContext.afterAll);
+  test.beforeEach(gridContext.beforeEach);
 
   test('displays GRID header and system status', async () => {
-    await expect(gridPage.getHeaderTitle()).toHaveText('GRID SQUARE VISUALIZER');
-    await expect(gridPage.getSystemStatus()).toBeVisible();
+    const gridPage = gridContext.getPageObject();
+    await assertHeaderAndStatus(gridPage, 'GRID SQUARE VISUALIZER');
   });
 
   test('WOPR lights container is present', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getWoprLights()).toBeAttached();
   });
 
   test('displays timestamp display', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getTimestampDisplay()).toBeVisible();
   });
 
   test('displays data input section with all elements', async () => {
-    await expect(gridPage.getLoadDemoDataButton()).toBeVisible();
-    await expect(gridPage.getMyGridInput()).toBeVisible();
+    const gridPage = gridContext.getPageObject();
+    await assertDataInputVisible(gridPage);
   });
 
   test('displays display options section', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getColorByBandCheckbox()).toBeVisible();
     await expect(gridPage.getBrightMapCheckbox()).toBeVisible();
     await expect(gridPage.getShowFieldsCheckbox()).toBeVisible();
@@ -45,6 +51,7 @@ test.describe('GRID App - Initial Load', () => {
   });
 
   test('checkboxes have correct default states', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getColorByBandCheckbox()).not.toBeChecked();
     await expect(gridPage.getBrightMapCheckbox()).not.toBeChecked();
     await expect(gridPage.getShowFieldsCheckbox()).toBeChecked();
@@ -52,36 +59,41 @@ test.describe('GRID App - Initial Load', () => {
   });
 
   test('displays statistics section', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getTotalContacts()).toHaveText('0');
     await expect(gridPage.getUniqueGrids()).toHaveText('0');
     await expect(gridPage.getCountries()).toHaveText('0');
   });
 
   test('buttons are disabled initially', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getScreenshotButton()).toBeDisabled();
     await expect(gridPage.getViewStatsButton()).toBeDisabled();
   });
 
   test('displays map container', async () => {
-    await expect(gridPage.getMap()).toBeVisible();
+    const gridPage = gridContext.getPageObject();
+    await assertMapVisible(gridPage);
   });
 
   test('map container has correct attributes', async () => {
-    const map = gridPage.getMap();
-    await expect(map).toHaveAttribute('id', 'map');
+    const gridPage = gridContext.getPageObject();
+    await expect(gridPage.getMap()).toHaveAttribute('id', 'map');
   });
 
   test('my grid input has correct default value', async () => {
+    const gridPage = gridContext.getPageObject();
     await expect(gridPage.getMyGridInput()).toHaveValue('EN91');
   });
 
   test('my grid input has max length of 4', async () => {
+    const gridPage = gridContext.getPageObject();
     const maxLength = await gridPage.getMyGridInput().getAttribute('maxlength');
     expect(maxLength).toBe('4');
   });
 
   test('footer status is visible', async () => {
-    await expect(gridPage.getStatusLeft()).toBeVisible();
-    await expect(gridPage.getStatusRight()).toBeVisible();
+    const gridPage = gridContext.getPageObject();
+    await assertFooterStatusVisible(gridPage);
   });
 });

@@ -10,7 +10,7 @@ Comprehensive Playwright test suite covering:
 - **VIBE** - Landing page and app navigation
 - **WARADIO** - ADIF Log Visualizer (playback, statistics, map)
 - **GRID** - Grid Square Visualizer (demo data, toggles, stats)
-- **LIVE** - FT8 Live Map (real-time spots, filters)
+- **LIVE** - FT8 Live Map (real-time spots, filters, My Call)
 
 ## Architecture
 
@@ -18,23 +18,70 @@ Uses **Page Object Model (POM)** pattern with centralized URL configuration.
 
 ```
 config/
-  index.js           # Centralized configuration with env var support
+  index.js              # Centralized configuration with env var support
 pages/
-  BasePage.js        # Base page object with common methods
-  LandingPage.js     # Page object for VIBE landing page
-  AppPage.js         # Generic app page object
-  WaradioPage.js     # Page object for WARADIO ADIF Log Visualizer
-  GridPage.js        # Page object for GRID Square Visualizer
-  LivePage.js        # Page object for LIVE FT8 Live Map
-  index.js           # Page factory (create*Page functions)
+  BasePage.js           # Base page object with common methods
+  LandingPage.ts        # Page object for VIBE landing page
+  AppPage.ts            # Generic app page object
+  WaradioPage.ts        # Page object for WARADIO ADIF Log Visualizer
+  GridPage.ts           # Page object for GRID Square Visualizer
+  LivePage.ts           # Page object for LIVE FT8 Live Map
+  index.js              # Page factory (create*Page functions)
 tests/
-  vibe.spec.ts       # Landing page tests
-  live.spec.ts       # LIVE app tests
-  grid*.spec.ts      # GRID app tests (initial, happy, edge, uiux)
-  waradio*.spec.ts   # WARADIO app tests (initial, playback, etc.)
-  broken-links.spec.ts # HTTP link verification
-playwright.config.ts # Playwright config with env var support
+  test-utils.js         # Shared test utilities (browser setup, context)
+  vibe.spec.ts          # Landing page tests
+  live.spec.ts          # LIVE app tests (uses test-utils.js)
+  grid*.spec.ts         # GRID app tests (initial, happy, edge, uiux)
+  waradio*.spec.ts      # WARADIO app tests (initial, playback, etc.)
+  broken-links.spec.ts  # HTTP link verification
+playwright.config.ts   # Playwright config with env var support
 ```
+
+### TypeScript Page Objects
+
+All page objects are written in **TypeScript** (.ts) with JSDoc annotations:
+
+```typescript
+/** @returns {import('@playwright/test').Locator} */
+getHeaderTitle() {
+  return this.page.locator('h1');
+}
+```
+
+TypeScript features:
+- `Page` type from Playwright for browser page
+- `Locator` return types for UI element getters
+- Parameter types for action methods
+- Strict mode disabled for incremental adoption
+
+### Shared Test Utilities
+
+Browser lifecycle management is DRY via `tests/test-utils.js`:
+
+```javascript
+const { createTestSuite } = require('./test-utils');
+
+const liveContext = createTestSuite({
+  pageName: 'Live',
+  createPageObject: createLivePage,
+});
+
+test.describe('LIVE App', () => {
+  test.beforeAll(liveContext.beforeAll);
+  test.afterAll(liveContext.afterAll);
+  test.beforeEach(liveContext.beforeEach);
+
+  test('displays header', async () => {
+    const livePage = liveContext.getPageObject();
+    await expect(livePage.getHeaderTitle()).toHaveText('LIVE HAMRADIO MAP');
+  });
+});
+```
+
+Available utilities:
+- `createBrowser()` - Launches browser with options
+- `closeBrowser()` - Cleans up browser/page
+- `createTestSuite()` - Creates reusable test context
 
 ### Configuration Pattern
 
@@ -103,6 +150,9 @@ npm run test:fast           # Run tests excluding stress tests
 npm run test:stress         # Run only stress tests
 npm run test:html           # Run tests with HTML report
 npm run test:ci             # Run tests with HTML report (CI mode)
+npm run test:live           # Run only LIVE app tests
+npm run test:war only WARADIOadio        # Run app tests
+npm run test:grid           # Run only GRID app tests
 ```
 
 ### HTML Report
@@ -162,9 +212,64 @@ xdg-open playwright-report/index.html  # Linux
 
 ## Test Coverage by App
 
+### LIVE App (FT8 Live Map)
+
+**Total: 35 tests (2 skipped)**
+
+#### live.spec.ts
+
+**LIVE App - Initial Load (10 tests)**
+- **displays LIVE header and system status** - Verifies h1 title "LIVE HAMRADIO MAP" and system status indicator
+- **displays timestamp** - Timestamp display element is visible
+- **displays map container** - Leaflet map is visible
+- **displays mode filter buttons** - Mode filter buttons (ALL, FT8, FT4, JS8, etc.) are visible
+- **displays band filter buttons** - Band filter buttons (160m-2m) are visible
+- **displays display options section** - Color by band, bright map, draw lines checkboxes are visible
+- **displays live feed section** - CONNECT LIVE button is visible
+- **displays my call section** - My callsign input and HEARD ME button are visible
+- **displays zoom controls** - Zoom in/out buttons are visible
+- **page title is correct** - Title contains "Live Map"
+
+**LIVE App - Functionality (5 tests)**
+- **connect live button is clickable** - CONNECT LIVE button is enabled
+- **my call input accepts text** - Callsign input accepts and displays text
+- **mode filter has FT8 option** - FT8 mode filter button is visible
+- **band filter has 20m option** - 20m band filter button is visible
+- **heard me button is disabled initially** - HEARD ME button is disabled until callsign entered
+
+**LIVE App - UI/UX (4 tests)**
+- **page loads without JavaScript errors** - No JS errors in console
+- **footer status is visible** - Left and right status bar elements visible
+- **map is visible on mobile viewport** - Map visible on mobile (375x667)
+- **display options have correct default states** - Color by band and draw lines checked; bright map unchecked
+
+**LIVE App - My Call Fuzz Tests (11 tests)**
+- **accepts basic US callsigns** - WT2P, WB9ZZZ, K1ABC, N3XYZ, AA9SS
+- **accepts callsigns with numbers** - P40XA, 3Z9X, 9Y4L, 4U1ITU
+- **accepts callsigns with single slash prefix** - P4/WT2P, G4DIY/P, W1ABC/MM
+- **accepts callsigns with dashes for SSID** - WT2P-9, W1ABC-4, K1XYZ-1, DL5YBR-7, LA3YY-15
+- **accepts European callsigns** - DL1ABS, G4DIY, M0XYZ, PA1TT, OH2ZZ, LA3YY, SM5AZQ
+- **accepts callsigns with special prefixes** - 4U1ITU, 4U1WXC, ZL9DX, VK0IR, FT5YJ, LU8XW
+- **accepts short callsigns** - WT2P, WB9, K1X, N4Z, P40
+- **accepts callsigns with slash and SSID** - WT2P-9, P4/WT2P-7
+- **clearing my call input works correctly** - Input can be cleared
+- **overwrites existing callsign when setting new one** - Setting new callsign replaces old
+
+**LIVE App - Live Feed Tests (7 tests)**
+- **connect button is enabled and clickable** - CONNECT LIVE button is enabled
+- **clicking connect does not cause errors** - Button interaction works
+- **map container is visible during live feed** - Map stays visible when connected
+- **feed controls remain visible during live feed** - My Call and CONNECT LIVE visible
+- **mode filter buttons remain visible during live feed** - Mode filters stay visible
+- **band filter buttons remain visible during live feed** - Band filters stay visible
+- **multiple connect/disconnect cycles do not cause errors** - Toggle works reliably
+- **live feed toggle preserves page functionality** - Header and status remain accessible
+
+---
+
 ### WARADIO App (ADIF Log Visualizer)
 
-**Total: 75 running tests, 8 skipped**
+**Total: 71 running tests, 11 skipped**
 
 #### waradio-initial.spec.ts (10 tests)
 - **displays WARadio header and system status** - Verifies h1 title "WARadio Contact Visualizer" and system status indicator visibility
@@ -269,15 +374,7 @@ xdg-open playwright-report/index.html  # Linux
 
 ### GRID App (Grid Square Visualizer)
 
-**Total: ~85 tests across multiple spec files**
-
-#### grid.spec.ts (comprehensive test suite with embedded GridPage class)
-- **GRID App - Initial Load** (~20 tests) - Header, system status, data input, display options, statistics, map, footer
-- **GRID App - Happy Path** (11 tests) - Demo data loading, button enablement, grid squares on map, toggle functionality, stats popup
-- **GRID App - Edge Cases** (~10 tests) - Invalid grid input, special characters, loading overlay, error popup, map resize
-- **GRID App - UI/UX** (~20 tests) - Panel titles, button labels, checkbox labels, CRT overlay, VT323 font, mobile responsiveness
-- **GRID App - ADIF Loading** (5 tests - all skipped) - ADIF file upload handling (pending manual review)
-- **GRID App - Map Features** (~10 tests) - Leaflet integration, zoom controls, grid square rendering, color by band, bright map mode
+**Total: ~113 tests across multiple spec files**
 
 #### grid-initial.spec.ts (12 tests)
 - **displays GRID header and system status** - "GRID SQUARE VISUALIZER" title and status indicator
@@ -309,67 +406,25 @@ xdg-open playwright-report/index.html  # Linux
 
 ---
 
-### LIVE App (FT8 Live Map)
-
-**Total: 19 tests**
-
-#### live.spec.ts (19 tests)
-
-**LIVE App - Initial Load (10 tests)**
-- **displays LIVE header and system status** - Verifies h1 title "LIVE HAMRADIO MAP" and system status indicator
-- **displays timestamp** - Timestamp display element is visible
-- **displays map container** - Leaflet map is visible
-- **displays mode filter buttons** - Mode filter buttons (ALL, FT8, FT4, WSPR, VARAC, JS8) are visible
-- **displays band filter buttons** - Band filter buttons (160m-2m) are visible
-- **displays display options section** - Color by band, bright map, draw lines checkboxes are visible
-- **displays live feed section** - CONNECT LIVE button is visible
-- **displays my call section** - My callsign input and HEARD ME button are visible
-- **displays zoom controls** - Zoom in/out buttons are visible
-- **page title is correct** - Title contains "Live Map"
-
-**LIVE App - Functionality (5 tests)**
-- **connect live button is clickable** - CONNECT LIVE button is enabled
-- **my call input accepts text** - Callsign input accepts and displays text
-- **mode filter has FT8 option** - FT8 mode filter button is visible
-- **band filter has 20m option** - 20m band filter button is visible
-- **heard me button is disabled initially** - HEARD ME button is disabled until callsign entered
-
-**LIVE App - UI/UX (4 tests)**
-- **page loads without JavaScript errors** - No JS errors in console
-- **footer status is visible** - Left and right status bar elements visible
-- **map is visible on mobile viewport** - Map visible on mobile (375x667)
-- **display options have correct default states** - Color by band and draw lines checked; bright map unchecked
-
----
-
-## Test Coverage
-
-### vibe.spec.ts (Playwright with Assertions)
-
-- **has correct heading and status** - Verifies h1 title and status text
-- **has all app cards with correct links** - Checks card count and href attributes
-- **aria snapshot has expected structure** - Validates ARIA landmarks and content
-- **all app links are accessible** - Verifies links are visible and enabled
-- **section titles are visible** - Checks section title text
-
-### broken-links.test.js (Legacy)
-
-- Landing page app links HTTP status check
-- All internal links on each app page
-- Console errors (excluding network errors and favicon)
-
-### What's Skipped
-
-- Anchor links (URLs ending with `#`)
-- External dependencies (Leaflet, OpenStreetMap, CARTO attribution links)
-- ADIF file upload tests (require actual test ADIF files and manual review)
-- ARIA snapshot tests (pending visual regression testing configuration)
-
----
-
 ## Page Objects
 
-### WaradioPage.js
+All page objects use TypeScript with JSDoc annotations for IDE support.
+
+### LivePage.ts
+
+Page object for LIVE FT8 Live Map. Provides methods for:
+
+- **Navigation**: `load()`
+- **Header Elements**: `getHeaderTitle()`, `getSystemStatus()`, `getTimestampDisplay()`
+- **Map**: `getMap()`, `getZoomInButton()`, `getZoomOutButton()`
+- **Filters**: `getModeButtons()`, `getBandButtons()`, `clickModeButton()`, `clickBandButton()`
+- **Display Options**: `getColorByBandCheckbox()`, `getBrightMapCheckbox()`, `getDrawLinesCheckbox()`
+- **Live Feed**: `getConnectLiveButton()`, `getSpotCount()`, `clickConnectLive()`, `waitForSpots()`, `waitForNewSpot()`
+- **My Call**: `getMyCallInput()`, `getHeardMeButton()`, `setMyCall()`
+- **Statistics**: `getSpotCountValue()`, `getStatistics()`, `getFeedInfo()`
+- **Map Elements**: `getMapMarkers()`, `getMapLines()`
+
+### WaradioPage.ts
 
 Page object for WARADIO ADIF Log Visualizer. Provides methods for:
 
@@ -379,9 +434,9 @@ Page object for WARADIO ADIF Log Visualizer. Provides methods for:
 - **Current Contact**: `getCurrentContact()`, `getContactCallsign()`, `getContactLocation()`, `getContactMode()`, `getContactBand()`, `getContactDistance()`, `getContactGrid()`
 - **Checkboxes**: `getRealTimeCheckbox()`, `getGapDetectionCheckbox()`, `getDeriveLocationCheckbox()`, `getSlowPlotCheckbox()`, `getBrighterMapCheckbox()`
 - **Input Fields**: `getMyGridInput()`, `getAdifFileInput()`
-- **Map Elements**: `getMap()`, `getBandLegend()`
+- **Map Elements**: `getMap()`, `getBandLegend()`, `getMapMarkers()`, `getMapMarkerCount()`
 
-### GridPage.js
+### GridPage.ts
 
 Page object for GRID Square Visualizer. Provides methods for:
 
@@ -390,52 +445,71 @@ Page object for GRID Square Visualizer. Provides methods for:
 - **Data Input**: `getAdifFileInput()`, `getLoadDemoDataButton()`, `getFileInfo()`, `getMyGridInput()`
 - **Display Options**: `getColorByBandCheckbox()`, `getBrightMapCheckbox()`, `getShowFieldsCheckbox()`, `getShowFieldLabelsCheckbox()`, `toggleBrightMap()`, `toggleColorByBand()`
 - **Statistics**: `getStatistics()`, `getTotalContacts()`, `getUniqueGrids()`, `getCountries()`, `openStats()`, `closeStats()`
-- **Map Elements**: `getMap()`, `getMapContainer()`, `getGridSquares()`, `getGridSquareCount()`, `getFieldLabels()`
+- **Map Elements**: `getMap()`, `getMapContainer()`, `getGridSquares()`, `getGridSquareCount()`, `getFieldLabels()`, `getMapBounds()`
 - **Actions**: `setMyGrid()`, `getScreenshotButton()`, `getViewStatsButton()`, `getStatsPopup()`
 
-### LivePage.js
+### LandingPage.ts
 
-Page object for LIVE FT8 Live Map. Provides methods for:
+Page object for VIBE landing page. Provides methods for:
 
-- **Navigation**: `load()`
-- **Header Elements**: `getHeaderTitle()`, `getSystemStatus()`, `getTimestampDisplay()`
-- **Map**: `getMap()`, `getZoomInButton()`, `getZoomOutButton()`
-- **Filters**: `getModeButtons()`, `getBandButtons()`, `clickModeButton()`, `clickBandButton()`
-- **Display Options**: `getColorByBandCheckbox()`, `getBrightMapCheckbox()`, `getClassicFormatCheckbox()`, `getShowLabelsCheckbox()`, `getDrawLinesCheckbox()`
-- **Live Feed**: `getConnectLiveButton()`, `getSpotCount()`, `getClearAllButton()`, `clickConnectLive()`, `clickClearAll()`, `waitForSpots()`
-- **My Call**: `getMyCallInput()`, `getHeardMeButton()`, `getHeardByMeButton()`, `setMyCall()`
-- **Location**: `getEnableLocationButton()`, `enableLocation()`
-- **Status**: `getStatusLeft()`, `getStatusRight()`
+- **Links**: `getAppLinks()`, `getAppLink(appName)`, `verifyAllAppLinks()`
+- **ARIA**: `getAriaSnapshot()`, `verifyAriaSnapshot(expected)`, `takeAndLogAriaSnapshot()`
+
+### AppPage.ts
+
+Generic app page object for link checking. Provides methods for:
+
+- **Link Checking**: `getLinkCheckResults()`, `checkAllLinks()`
 
 ---
 
 ## Adding New Tests
 
-### Adding Playwright Tests
+### Using Shared Test Utilities
 
-Create new `.spec.ts` files in `tests/`:
+Use `createTestSuite` for consistent browser lifecycle:
 
-```typescript
+```javascript
 const { test, expect } = require('@playwright/test');
+const { createLivePage } = require('../pages');
+const { createTestSuite } = require('./test-utils');
+
+const liveContext = createTestSuite({
+  pageName: 'Live',
+  createPageObject: createLivePage,
+});
 
 test.describe('New Feature', () => {
-  test('should do something', async ({ page }) => {
-    await page.goto('https://vibe.0x8v.io');
-    await expect(page.locator('selector')).toBeVisible();
+  test.beforeAll(liveContext.beforeAll);
+  test.afterAll(liveContext.afterAll);
+  test.beforeEach(liveContext.beforeEach);
+
+  test('should do something', async () => {
+    const livePage = liveContext.getPageObject();
+    // Test implementation
   });
 });
 ```
 
-### Adding Page Objects
+### Creating Page Objects
 
-Extend `BasePage` in `pages/`:
+Extend `BasePage` in TypeScript:
 
-```javascript
+```typescript
 const BasePage = require('./BasePage');
+const { getAppUrl } = require('../config');
+
+/** @typedef {import('@playwright/test').Page} Page */
 
 class NewPage extends BasePage {
-  async specificMethod() {
-    // Custom methods
+  /** @param {Page} page */
+  constructor(page) {
+    super(page, getAppUrl('newapp'));
+  }
+
+  /** @returns {import('@playwright/test').Locator} */
+  getHeaderTitle() {
+    return this.page.locator('h1');
   }
 }
 
@@ -446,3 +520,4 @@ module.exports = NewPage;
 
 - Node.js 12+
 - @playwright/test
+- TypeScript (for page objects)

@@ -1,19 +1,18 @@
 # Test Scenarios & Coverage Documentation
 
-This document provides an overview of all test scenarios, what's covered, what's missing, and how to use ARIA snapshot tests for UI regression detection.
+This document provides an overview of all test scenarios, what's covered, what's missing, and how tests are structured.
 
 ## Test Summary
 
 | App | Spec Files | Tests | Status |
 |-----|-----------|-------|--------|
-| Vibe (Landing) | vibe.spec.ts | 6 | ✅ Complete |
-| WARADIO | waradio-*.spec.ts | 81 | ✅ Complete (8 skipped for ADIF) |
-| GRID | grid*.spec.ts | ~100 | ✅ Complete (5 skipped for ADIF) |
-| LIVE | live.spec.ts | 19 | ✅ Complete |
+| Vibe (Landing) | vibe.spec.ts | 15 | ✅ Complete |
+| WARADIO | waradio-*.spec.ts | 82 | ✅ Complete (11 skipped for ADIF) |
+| GRID | grid*.spec.ts | ~113 | ✅ Complete (18 skipped) |
+| LIVE | live.spec.ts | 35 | ✅ Complete (2 skipped) |
 | Broken Links | broken-links.spec.ts | 4 | ✅ Complete |
-| **ARIA Snapshots** | aria-snapshots.spec.ts | 4 | 🆕 New |
 
-**Total: ~249 tests (230 running, 19 skipped)**
+**Total: ~249 tests (218 running, 31 skipped)**
 
 ---
 
@@ -26,6 +25,26 @@ This document provides an overview of all test scenarios, what's covered, what's
 - ✅ All app links accessible
 - ✅ Section titles visible
 - ✅ Footer elements present
+- ✅ Stress tests for edge cases
+
+### LIVE App (live.spec.ts)
+- ✅ Initial load (header, status, map, filters, options)
+- ✅ Functionality (connect button, callsign input, filters)
+- ✅ UI/UX (no JS errors, footer, mobile responsive, defaults)
+- ✅ **My Call Fuzz Tests** - Comprehensive callsign validation:
+  - Basic US callsigns (WT2P, WB9ZZZ, K1ABC, etc.)
+  - Callsigns with numbers (P40XA, 3Z9X, 4U1ITU, etc.)
+  - Callsigns with slashes (P4/WT2P, G4DIY/P, W1ABC/MM)
+  - Callsigns with dashes/SSID (WT2P-9, W1ABC-4, LA3YY-15)
+  - European callsigns (DL1ABS, G4DIY, PA1TT, etc.)
+  - Special prefixes (4U1ITU, ZL9DX, VK0IR, etc.)
+  - Short callsigns and combined formats
+- ✅ **Live Feed Tests** - Feed connectivity and UI stability:
+  - Connect/disconnect button functionality
+  - Map visibility during feed
+  - Controls remain visible during feed
+  - Multiple connect/disconnect cycles
+  - Page functionality preserved during toggle
 
 ### WARADIO App (waradio-*.spec.ts)
 - ✅ Initial load (header, status, controls, checkboxes, statistics)
@@ -45,119 +64,40 @@ This document provides an overview of all test scenarios, what's covered, what's
 - ✅ Map features (zoom, grid squares, color by band)
 - ⏭️ ADIF file upload (requires test files)
 
-### LIVE App (live.spec.ts)
-- ✅ Initial load (header, status, map, filters, options)
-- ✅ Functionality (connect button, callsign input, filters)
-- ✅ UI/UX (no JS errors, footer, mobile responsive, defaults)
-
 ---
 
-## What's Missing / Planned
+## Test Utilities
 
-### ARIA Snapshot Testing - DEPRECATED
+### Shared Browser Setup (`tests/test-utils.js`)
 
-Full ARIA snapshots were attempted but found unsuitable because:
+Browser lifecycle management is DRY via shared utilities:
 
-1. **Pages have dynamic content** - Timestamps, versions, spot counts change on every run
-2. **False positives** - Any UI update (even a version bump) would fail tests
-3. **Maintenance burden** - Would require constant snapshot updates
+```javascript
+const { createTestSuite } = require('./test-utils');
 
-**Current Approach:** Instead of full snapshots, we use targeted assertions:
+const liveContext = createTestSuite({
+  pageName: 'Live',
+  createPageObject: createLivePage,
+});
 
-```typescript
-// vibe.spec.ts - Check structure without exact snapshot
-test('aria snapshot has expected structure', async () => {
-  const snapshot = await page.locator('body').ariaSnapshot();
-  expect(snapshot).toContain('HAMRAD INTERFACE');
-  expect(snapshot).toContain('WARADIO');
-  expect(snapshot).toContain('GRID');
-  expect(snapshot).toContain('LIVE');
+test.describe('Feature', () => {
+  test.beforeAll(liveContext.beforeAll);
+  test.afterAll(liveContext.afterAll);
+  test.beforeEach(liveContext.beforeEach);
+
+  test('test name', async () => {
+    const livePage = liveContext.getPageObject();
+    // Test implementation
+  });
 });
 ```
 
-This approach:
-- ✅ Detects missing major UI elements
-- ✅ Ignores dynamic content
-- ✅ Doesn't require snapshot maintenance
-- ⚠️ Won't catch subtle layout changes
-
----
-
-## Future Enhancements (If Needed)
-
-If visual regression testing is needed later, consider:
-
-1. **Playwright Visual Snapshots** (requires approved UI changes)
-   ```typescript
-   test('matches visual snapshot', async () => {
-     await expect(page).toHaveScreenshot('app-page.png');
-   });
-   ```
-
-2. **Percy or Chromatic** - Full visual regression SaaS
-
-3. **Storybook** - Component-level visual testing
-
----
-
-## ARIA Snapshot Testing Guide
-
-### Why ARIA Snapshots?
-
-ARIA snapshots capture the accessibility tree structure of a page. When UI changes:
-1. **Headings** are added/removed/reordered
-2. **Landmarks** (banner, main, complementary, contentinfo) change
-3. **Interactive elements** (buttons, links, checkboxes) are added/removed
-4. **Form controls** (textboxes, checkboxes) change state
-
-This catches regressions that functional tests might miss.
-
-### How It Works
-
-```typescript
-test('matches page ARIA snapshot', async () => {
-  const snapshot = await page.locator('body').ariaSnapshot();
-  expect(snapshot).toMatchInlineSnapshot(`
-    - banner:
-      - heading "APP NAME" [level=1]
-      ...
-  `);
-});
-```
-
-### Running ARIA Snapshot Tests
-
-```bash
-# Run all ARIA snapshot tests
-npm run test:aria
-
-# Run specific app
-npx playwright test tests/aria-snapshots.spec.ts --grep "WARADIO"
-
-# Update snapshots after approved UI changes
-npx playwright test tests/aria-snapshots.spec.ts --update-snapshots
-```
-
-### When Snapshots Fail
-
-If an ARIA snapshot test fails:
-
-1. **Check if the change was intentional**
-   - Did a developer intentionally add/remove UI elements?
-   - Was this a design update?
-
-2. **Review the diff**
-   - The test output shows exactly what changed
-   - Compare old vs new structure
-
-3. **Update if approved**
-   ```bash
-   npx playwright test tests/aria-snapshots.spec.ts --update-snapshots
-   ```
-
-4. **Document the change**
-   - Update this document
-   - Note the change in commit message
+**Available functions:**
+- `createBrowser(options)` - Launches browser with headless option
+- `closeBrowser(page, browser)` - Cleans up browser/page
+- `createTestSuite(options)` - Creates reusable test context
+- `createTestContext(options)` - Alternative context creator
+- `withContext(options)` - Wrapper for context management
 
 ---
 
@@ -165,71 +105,125 @@ If an ARIA snapshot test fails:
 
 ```
 tests/
-├── aria-snapshots.spec.ts      # ARIA baseline snapshots (NEW)
-├── broken-links.spec.ts        # HTTP link checking
-├── vibe.spec.ts                # Landing page tests
-├── live.spec.ts                # LIVE FT8 Map tests
-├── grid-initial.spec.ts        # GRID initial load
-├── grid-happy.spec.ts          # GRID happy path
-├── grid-edge.spec.ts           # GRID edge cases
-├── grid-uiux.spec.ts           # GRID UI/UX
-├── grid.spec.ts                # GRID comprehensive
-├── waradio-initial.spec.ts     # WARADIO initial load
-├── waradio-playback.spec.ts    # WARADIO playback
+├── test-utils.js            # Shared browser/page utilities (NEW)
+├── aria-snapshots.spec.ts   # ARIA baseline snapshots (if needed)
+├── broken-links.spec.ts     # HTTP link checking
+├── vibe.spec.ts             # Landing page tests
+├── live.spec.ts             # LIVE FT8 Map tests (uses test-utils)
+├── grid-initial.spec.ts     # GRID initial load
+├── grid-happy.spec.ts       # GRID happy path
+├── grid-edge.spec.ts        # GRID edge cases
+├── grid-uiux.spec.ts        # GRID UI/UX
+├── grid.spec.ts             # GRID comprehensive
+├── waradio-initial.spec.ts  # WARADIO initial load
+├── waradio-playback.spec.ts # WARADIO playback
 ├── waradio-checkboxes.spec.ts  # WARADIO checkboxes
-├── waradio-map.spec.ts         # WARADIO map
-├── waradio-grid.spec.ts        # WARADIO grid input
+├── waradio-map.spec.ts      # WARADIO map
+├── waradio-grid.spec.ts     # WARADIO grid input
 ├── waradio-statistics.spec.ts  # WARADIO statistics
-├── waradio-uiux.spec.ts        # WARADIO UI/UX
+├── waradio-uiux.spec.ts     # WARADIO UI/UX
 └── waradio-adif-skipped.spec.ts # WARADIO ADIF (skipped)
 ```
 
 ---
 
-## Adding New Test Scenarios
+## Page Objects (TypeScript)
 
-### 1. Functional Test (using Page Objects)
+All page objects are written in TypeScript (.ts) with JSDoc annotations:
 
 ```typescript
-// tests/new-feature.spec.ts
+/** @returns {import('@playwright/test').Locator} */
+getHeaderTitle() {
+  return this.page.locator('h1');
+}
+```
+
+### LivePage.ts - My Call Fuzz Testing
+
+The LIVE app includes comprehensive My Call input fuzz testing:
+
+```typescript
+test('accepts basic US callsigns', async () => {
+  const callsigns = ['WT2P', 'WB9ZZZ', 'K1ABC', 'N3XYZ', 'AA9SS'];
+  for (const callsign of callsigns) {
+    await livePage.setMyCall(callsign);
+    expect(await livePage.getMyCallInput().inputValue()).toBe(callsign);
+  }
+});
+
+test('accepts callsigns with dashes for SSID', async () => {
+  const callsigns = ['WT2P-9', 'W1ABC-4', 'K1XYZ-1', 'DL5YBR-7', 'LA3YY-15'];
+  // ...
+});
+```
+
+**Valid Callsign Patterns:**
+- Basic: `WT2P`, `WB9ZZZ`, `K1ABC`
+- With numbers: `P40XA`, `3Z9X`, `4U1ITU`
+- With slash: `P4/WT2P`, `G4DIY/P`, `W1ABC/MM`
+- With dash/SSID: `WT2P-9`, `W1ABC-4`, `LA3YY-15`
+- European: `DL1ABS`, `G4DIY`, `PA1TT`, `OH2ZZ`
+
+---
+
+## Adding New Test Scenarios
+
+### 1. Using Test Utilities (Recommended)
+
+```javascript
 const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
+const { createNewPage } = require('../pages');
+const { createTestSuite } = require('./test-utils');
+
+const newContext = createTestSuite({
+  pageName: 'NewFeature',
+  createPageObject: createNewPage,
+});
 
 test.describe('New Feature', () => {
-  let waradioPage;
-
-  test.beforeEach(async ({ page }) => {
-    waradioPage = createWaradioPage(page);
-    await waradioPage.load();
-  });
+  test.beforeAll(newContext.beforeAll);
+  test.afterAll(newContext.afterAll);
+  test.beforeEach(newContext.beforeEach);
 
   test('does something', async () => {
+    const newPage = newContext.getPageObject();
     // Test implementation
   });
 });
 ```
 
-### 2. ARIA Snapshot Test
+### 2. Page Object Method Pattern
+
+Add methods to page objects for reusable functionality:
 
 ```typescript
-// Add to tests/aria-snapshots.spec.ts
-test.describe('ARIA Snapshots - App Name', () => {
-  let page;
+// pages/LivePage.ts
+/**
+ * @param {string} callsign
+ * @returns {Promise<LivePage>}
+ */
+async setMyCall(callsign) {
+  await this.getMyCallInput().fill(callsign);
+  return this;
+}
+```
 
-  test.beforeAll(async () => {
-    const browser = await chromium.launch();
-    page = await browser.newPage();
-    await page.goto('https://app.0x8v.io', { waitUntil: 'networkidle' });
-  });
+### 3. Fuzz Testing Pattern
 
-  test.afterAll(async () => {
-    await page.close();
-  });
+For input validation tests, use parameterized testing:
 
-  test('matches app ARIA snapshot', async () => {
-    const snapshot = await page.locator('body').ariaSnapshot();
-    expect(snapshot).toMatchInlineSnapshot(`...`);
-  });
+```typescript
+test('accepts valid formats', async () => {
+  const validFormats = [
+    'WT2P',      // Basic
+    'P40XA',     // With number
+    'P4/WT2P',   // With prefix
+    'WT2P-9',    // With SSID
+  ];
+  for (const format of validFormats) {
+    await livePage.setMyCall(format);
+    expect(await livePage.getMyCallInput().inputValue()).toBe(format);
+  }
 });
 ```
 
@@ -237,29 +231,23 @@ test.describe('ARIA Snapshots - App Name', () => {
 
 ## Best Practices
 
-### 1. Use Page Objects
+### 1. Use Test Utilities
+Always use `createTestSuite` for browser lifecycle management to reduce boilerplate.
+
+### 2. Use Page Objects
 All tests should use page objects from `pages/` directory for maintainability.
 
-### 2. Add ARIA Snapshots for New Pages
-When adding a new app/page, create an ARIA snapshot test:
+### 3. Add JSDoc Types
+Type your page objects for IDE support:
 ```typescript
-test('matches page ARIA snapshot', async () => {
-  const snapshot = await page.locator('body').ariaSnapshot();
-  expect(snapshot).toMatchInlineSnapshot(`- banner:...`);
-});
+/** @returns {import('@playwright/test').Locator} */
+getButton() { return this.page.locator('#btn'); }
 ```
 
-### 3. Handle Dynamic Content
-For pages with dynamic content (timestamps, spot counts):
-```typescript
-test('matches page ARIA snapshot (dynamic content)', async () => {
-  const snapshot = await page.locator('body').ariaSnapshot();
-  // Use regex for dynamic values
-  expect(snapshot).toMatch(/TIMESTAMP: \d{2}:\d{2}:\d{2}/);
-});
-```
+### 4. Parameterize Fuzz Tests
+Use arrays for multiple test cases to keep tests DRY.
 
-### 4. Skip ADIF Tests When Needed
+### 5. Skip ADIF Tests When Needed
 ADIF upload tests require actual test files:
 ```typescript
 test('can upload ADIF file', async () => {
@@ -275,20 +263,20 @@ test('can upload ADIF file', async () => {
 - Increase timeout: `test.describe('suite', { timeout: 120000 })`
 - Use explicit waits instead of `waitForTimeout`
 
-### ARIA Snapshot Mismatches
-- Run with `--update-snapshots` if changes are intentional
-- Check for async content that hasn't loaded
-- Verify page is in expected state
-
 ### Page Object Methods Not Found
 - Check `pages/index.js` exports the page object
 - Verify class extends `BasePage`
 - Ensure `load()` method navigates correctly
 
+### TypeScript Errors in Page Objects
+- Add JSDoc annotations for IDE support
+- Use `@typedef` for complex types
+- Check `tsconfig.json` includes pages directory
+
 ---
 
 ## References
 
-- [Playwright ARIA Snapshots](https://playwright.dev/docs/api/class-locator#locator-aria-snapshot)
-- [Page Object Model Pattern](https://playwright.dev/docs/test-pom)
-- [Visual Regression Testing](https://playwright.dev/docs/test-snapshots)
+- [Playwright Test](https://playwright.dev/docs/test-intro)
+- [Page Object Model](https://playwright.dev/docs/test-pom)
+- [TypeScript in Playwright](https://playwright.dev/docs/test-typescript)

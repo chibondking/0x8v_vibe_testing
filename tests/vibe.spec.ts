@@ -2,7 +2,12 @@ const { test, expect, chromium } = require('@playwright/test');
 const { createLandingPage } = require('../pages');
 const { getAppsConfig, getAppUrl, CONFIG } = require('../config');
 
+/**
+ * @typedef {import('../pages/LandingPage')} LandingPage
+ */
+
 test.describe('Vibe Landing Page', () => {
+  /** @type {import('@playwright/test').Page} */
   let page;
   
   test.beforeAll(async () => {

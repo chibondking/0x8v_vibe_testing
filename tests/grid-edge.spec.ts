@@ -1,7 +1,12 @@
 const { test, expect } = require('@playwright/test');
 const GridPage = require('../pages/GridPage');
 
+/**
+ * @typedef {import('../pages/GridPage')} GridPageType
+ */
+
 test.describe('GRID App - Edge Cases', () => {
+  /** @type {GridPageType} */
   let gridPage;
 
   test.beforeEach(async ({ page }) => {

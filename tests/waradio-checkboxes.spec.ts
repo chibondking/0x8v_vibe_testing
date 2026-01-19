@@ -37,7 +37,7 @@ test.describe('WARADIO App - Checkbox Interactions', () => {
     const waradioPage = waradioContext.getPageObject();
     await expect(waradioPage.getSlowPlotCheckbox()).not.toBeChecked();
     await waradioPage.getSlowPlotCheckbox().click();
-    await expect(waradioPage.getSlowPlotCheckbox()).toBeChecked();
+    await expect(waradioPage.isSlowPlotChecked()).toBe(true);
   });
 
   test('toggle gap detection on/off', async () => {

@@ -274,6 +274,10 @@ class WaradioPage extends BasePage {
     return await this.getRealTimeCheckbox().isChecked();
   }
 
+  async isSlowPlotChecked() {
+    return this.getSlowPlotCheckbox().isChecked();
+  }
+
   /** @returns {Promise<boolean>} */
   async isGapDetectionChecked() {
     return await this.getGapDetectionCheckbox().isChecked();

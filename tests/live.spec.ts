@@ -1,8 +1,14 @@
 const { test, expect, chromium } = require('@playwright/test');
 const { createLivePage } = require('../pages');
 
+/**
+ * @typedef {import('../pages/LivePage')} LivePage
+ */
+
 test.describe('LIVE App - Initial Load', () => {
+  /** @type {import('@playwright/test').Page} */
   let page;
+  /** @type {ReturnType<typeof createLivePage>} */
   let livePage;
 
   test.beforeAll(async () => {

@@ -160,7 +160,12 @@ class LivePage extends BasePage {
 
   async isConnected() {
     const text = await this.getConnectLiveButton().textContent();
-    return text.includes('DISCONNECT') || text.includes('LIVE');
+    return text.includes('DISCONNECT');
+  }
+
+  async isLiveFeedActive() {
+    const text = await this.getConnectLiveButton().textContent();
+    return text.includes('LIVE');
   }
 
   async waitForSpots(timeout = 30000) {
@@ -193,6 +198,81 @@ class LivePage extends BasePage {
     return {
       spotCount: await this.getSpotCount().textContent(),
       myCall: await this.getMyCallInput().inputValue(),
+    };
+  }
+
+  getSpotElements() {
+    return this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
+  }
+
+  async getSpotCountValue() {
+    const countText = await this.getSpotCount().textContent();
+    const match = countText.match(/\d+/);
+    return match ? parseInt(match[0]) : 0;
+  }
+
+  async getLiveFeedStatus() {
+    const statusElement = this.page.locator('#live-feed-status, .feed-status, [class*="status"]');
+    if (await statusElement.count() > 0) {
+      return await statusElement.textContent();
+    }
+    return null;
+  }
+
+  async getSpotData(index = 0) {
+    const spots = this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
+    const count = await spots.count();
+    if (count === 0 || index >= count) {
+      return null;
+    }
+    const spot = spots.nth(index);
+    return {
+      text: await spot.textContent(),
+      locator: spot,
+    };
+  }
+
+  async getAllSpotData() {
+    const spots = this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
+    const count = await spots.count();
+    const spotData = [];
+    for (let i = 0; i < Math.min(count, 50); i++) {
+      const spot = spots.nth(i);
+      spotData.push({
+        text: await spot.textContent(),
+        locator: spot,
+      });
+    }
+    return spotData;
+  }
+
+  async getMapMarkers() {
+    return this.page.locator('.leaflet-marker-icon, .marker, [class*="marker"]');
+  }
+
+  async getMapLines() {
+    return this.page.locator('.leaflet-polyline, .line, [class*="line"]');
+  }
+
+  async isLiveFeedActive() {
+    const buttonText = await this.getConnectLiveButton().textContent();
+    return buttonText.includes('DISCONNECT') || buttonText.includes('LIVE');
+  }
+
+  async getCurrentTimestamp() {
+    const timestampElement = this.page.locator('#timestamp-display, .timestamp');
+    if (await timestampElement.count() > 0) {
+      return await timestampElement.textContent();
+    }
+    return null;
+  }
+
+  async getFeedInfo() {
+    return {
+      spotCount: await this.getSpotCountValue(),
+      isConnected: await this.isLiveFeedActive(),
+      timestamp: await this.getCurrentTimestamp(),
+      status: await this.getLiveFeedStatus(),
     };
   }
 }

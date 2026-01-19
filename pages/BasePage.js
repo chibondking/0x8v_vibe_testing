@@ -1,11 +1,11 @@
-const { shouldSkipLink } = require('../config');
+const { shouldSkipLink, getAppUrl } = require('../config');
 
 class BasePage {
   constructor(page, baseUrl) {
     this.page = page;
     this.baseUrl = baseUrl;
     this.errors = [];
-    
+
     this.page.on('console', msg => {
       if (msg.type() === 'error') {
         const text = msg.text();
@@ -14,12 +14,12 @@ class BasePage {
         }
       }
     });
-    
+
     this.page.on('pageerror', error => {
       this.errors.push(error.message);
     });
   }
-  
+
   isIgnorableError(text) {
     const ignorablePatterns = [
       'net::ERR_',
@@ -28,7 +28,7 @@ class BasePage {
     ];
     return ignorablePatterns.some(pattern => text.includes(pattern));
   }
-  
+
   async goto(path = '/', options = {}) {
     const url = `${this.baseUrl}${path}`;
     return this.page.goto(url, {
@@ -37,15 +37,15 @@ class BasePage {
       ...options,
     });
   }
-  
+
   getPageErrors() {
     return this.errors;
   }
-  
+
   clearErrors() {
     this.errors = [];
   }
-  
+
   async getAllLinks() {
     return this.page.evaluate(() => {
       const anchorTags = Array.from(document.querySelectorAll('a[href]'));
@@ -56,7 +56,7 @@ class BasePage {
       }));
     });
   }
-  
+
   async getApplicableLinks() {
     const links = await this.getAllLinks();
     return links.filter(link => {
@@ -65,12 +65,12 @@ class BasePage {
       return true;
     });
   }
-  
+
   async getSkippedLinks() {
     const links = await this.getApplicableLinks();
     return links.filter(link => shouldSkipLink(link.url).skipped);
   }
-  
+
   async getTestableLinks() {
     const links = await this.getApplicableLinks();
     return links.filter(link => !shouldSkipLink(link.url).skipped);

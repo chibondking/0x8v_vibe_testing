@@ -2,7 +2,6 @@ const LandingPage = require('./LandingPage');
 const AppPage = require('./AppPage');
 const WaradioPage = require('./WaradioPage');
 const GridPage = require('./GridPage');
-const LivePage = require('./LivePage');
 const { getAppUrl, getLandingPageUrl } = require('../config');
 
 function createLandingPage(page) {
@@ -23,7 +22,7 @@ function createGridPage(page) {
 }
 
 function createLivePage(page) {
-  return new LivePage(page);
+  return new (require('./LivePage'))(page);
 }
 
 function createPage(page, url) {
@@ -40,7 +39,7 @@ function createPage(page, url) {
   }
   
   if (url.includes('live.0x8v.io')) {
-    return new LivePage(page);
+    return createLivePage(page);
   }
   
   const appMatch = url.match(/https?:\/\/(\w+)\.0x8v\.io/);

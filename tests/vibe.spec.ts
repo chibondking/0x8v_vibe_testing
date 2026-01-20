@@ -20,18 +20,10 @@ const vibeContext = createTestSuite({
  */
 
 test.describe('Vibe Landing Page', () => {
-  /** @type {import('@playwright/test').Page} */
-  let page;
-  
-  test.beforeAll(async () => {
-    const browser = await chromium.launch();
-    page = await browser.newPage();
-  });
-  
-  test.afterAll(async () => {
-    await page.close();
-  });
-  
+  test.beforeAll(vibeContext.beforeAll);
+  test.afterAll(vibeContext.afterAll);
+  test.beforeEach(vibeContext.beforeEach);
+
   test('has correct heading and status', async () => {
     const page = vibeContext.getPage();
     const landingPage = vibeContext.getPageObject();

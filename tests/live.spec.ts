@@ -11,7 +11,7 @@ const liveContext = createTestSuite({
   createPageObject: createLivePage,
 });
 
-test.describe('LIVE App - Initial Load', () => {
+test.describe('LIVE App - Initial Load @slow', () => {
   test.beforeAll(liveContext.beforeAll);
   test.afterAll(liveContext.afterAll);
   test.beforeEach(liveContext.beforeEach);
@@ -73,7 +73,7 @@ test.describe('LIVE App - Initial Load', () => {
   });
 });
 
-test.describe('LIVE App - Functionality', () => {
+test.describe('LIVE App - Functionality @slow', () => {
   test.beforeAll(liveContext.beforeAll);
   test.afterAll(liveContext.afterAll);
   test.beforeEach(liveContext.beforeEach);
@@ -106,7 +106,7 @@ test.describe('LIVE App - Functionality', () => {
   });
 });
 
-test.describe('LIVE App - UI/UX', () => {
+test.describe('LIVE App - UI/UX @slow', () => {
   test.beforeAll(liveContext.beforeAll);
   test.afterAll(liveContext.afterAll);
   test.beforeEach(liveContext.beforeEach);
@@ -139,7 +139,7 @@ test.describe('LIVE App - UI/UX', () => {
   });
 });
 
-test.describe('LIVE App - My Call Fuzz Tests', () => {
+test.describe('LIVE App - My Call Fuzz Tests @slow', () => {
   test.beforeAll(liveContext.beforeAll);
   test.afterAll(liveContext.afterAll);
   test.beforeEach(async () => {
@@ -247,7 +247,7 @@ test.describe('LIVE App - My Call Fuzz Tests', () => {
   });
 });
 
-test.describe('LIVE App - Live Feed Tests', () => {
+test.describe('LIVE App - Live Feed Tests @slow', () => {
   test.beforeAll(liveContext.beforeAll);
   test.afterAll(liveContext.afterAll);
   test.beforeEach(liveContext.beforeEach);

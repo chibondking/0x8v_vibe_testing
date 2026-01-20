@@ -41,7 +41,7 @@ test.describe('Broken Link Tests', () => {
   ];
 
   for (const app of apps) {
-    test.describe(`${app.name} (${app.url})`, () => {
+    test.describe(`${app.name} (${app.url}) @slow`, () => {
       test('should have no broken links', async ({ page }) => {
         const errors: string[] = [];
         
@@ -81,7 +81,7 @@ test.describe('Broken Link Tests', () => {
     });
   }
 
-  test('main landing page should have valid links to all apps', async ({ page }) => {
+  test('main landing page should have valid links to all apps @slow', async ({ page }) => {
     await page.goto(CONFIG.baseUrl, { waitUntil: 'networkidle', timeout: 30000 });
     
     const mainLinks = [

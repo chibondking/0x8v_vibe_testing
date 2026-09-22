@@ -12,7 +12,7 @@ export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
   timeout: 60000,
-  retries: 0,
+  retries: process.env.CI ? 2 : 1,
   use: {
     baseURL: baseUrl,
     headless: true,

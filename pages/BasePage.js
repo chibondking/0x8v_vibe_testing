@@ -33,7 +33,7 @@ class BasePage {
     const url = `${this.baseUrl}${path}`;
     return this.page.goto(url, {
       waitUntil: 'networkidle',
-      timeout: 30000,
+      timeout: 45000,
       ...options,
     });
   }

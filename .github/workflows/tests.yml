@@ -3,14 +3,6 @@ name: tests
 on:
   push:
   workflow_dispatch:
-    inputs:
-      suite:
-        description: "Which tests to run"
-        type: choice
-        default: default
-        options:
-          - default
-          - all
 
 jobs:
   playwright:
@@ -34,16 +26,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run tests
-        run: |
-          if [ "${{ inputs.suite }}" = "all" ]; then
-            npx playwright test
-          else
-            npm test
-          fi
+      - name: Run all tests
+        run: npx playwright test
 
       - name: Upload HTML report
-        if: failure() || inputs.suite == 'all'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

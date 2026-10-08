@@ -167,6 +167,10 @@ CI=1 npm test              # Also generates HTML report
 
 The HTML reporter disables parallel execution for proper report generation, so it runs slower than the default line reporter.
 
+### Continuous Integration
+
+GitHub Actions (`.github/workflows/tests.yml`) runs on every push: it type-checks the suite, runs every test (including `@stress` and `@slow`), and uploads the HTML report as the `playwright-report` artifact on every run, pass or fail. Download it from the run's summary page and open `index.html`.
+
 ### Stress Tests
 
 Stress tests are tagged with `@stress` and test edge cases:

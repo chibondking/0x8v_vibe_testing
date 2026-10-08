@@ -69,12 +69,12 @@ This document provides an overview of all test scenarios, what's covered, what's
 
 ## Test Utilities
 
-### Shared Browser Setup (`tests/test-utils.js`)
+### Shared Browser Setup (`tests/test-utils.ts`)
 
 Browser lifecycle management is DRY via shared utilities:
 
-```javascript
-const { createTestSuite } = require('./test-utils');
+```typescript
+import { createTestSuite } from './test-utils';
 
 const liveContext = createTestSuite({
   pageName: 'Live',
@@ -105,7 +105,8 @@ test.describe('Feature', () => {
 
 ```
 tests/
-├── test-utils.js            # Shared browser/page utilities (NEW)
+├── test-utils.ts            # Shared browser/page utilities
+├── assertions.ts            # Shared assertions and viewports
 ├── aria-snapshots.spec.ts   # ARIA baseline snapshots (if needed)
 ├── broken-links.spec.ts     # HTTP link checking
 ├── vibe.spec.ts             # Landing page tests
@@ -129,11 +130,10 @@ tests/
 
 ## Page Objects (TypeScript)
 
-All page objects are written in TypeScript (.ts) with JSDoc annotations:
+All page objects are TypeScript classes with typed methods:
 
 ```typescript
-/** @returns {import('@playwright/test').Locator} */
-getHeaderTitle() {
+getHeaderTitle(): Locator {
   return this.page.locator('h1');
 }
 ```
@@ -170,10 +170,10 @@ test('accepts callsigns with dashes for SSID', async () => {
 
 ### 1. Using Test Utilities (Recommended)
 
-```javascript
-const { test, expect } = require('@playwright/test');
-const { createNewPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
+```typescript
+import { test, expect } from '@playwright/test';
+import { createNewPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const newContext = createTestSuite({
   pageName: 'NewFeature',
@@ -198,11 +198,7 @@ Add methods to page objects for reusable functionality:
 
 ```typescript
 // pages/LivePage.ts
-/**
- * @param {string} callsign
- * @returns {Promise<LivePage>}
- */
-async setMyCall(callsign) {
+async setMyCall(callsign: string): Promise<LivePage> {
   await this.getMyCallInput().fill(callsign);
   return this;
 }
@@ -237,11 +233,10 @@ Always use `createTestSuite` for browser lifecycle management to reduce boilerpl
 ### 2. Use Page Objects
 All tests should use page objects from `pages/` directory for maintainability.
 
-### 3. Add JSDoc Types
-Type your page objects for IDE support:
+### 3. Type Page Objects
+Give every page-object method explicit parameter and return types; `npm run typecheck` runs in CI:
 ```typescript
-/** @returns {import('@playwright/test').Locator} */
-getButton() { return this.page.locator('#btn'); }
+getButton(): Locator { return this.page.locator('#btn'); }
 ```
 
 ### 4. Parameterize Fuzz Tests
@@ -264,14 +259,14 @@ test('can upload ADIF file', async () => {
 - Use explicit waits instead of `waitForTimeout`
 
 ### Page Object Methods Not Found
-- Check `pages/index.js` exports the page object
+- Check `pages/index.ts` exports the page object
 - Verify class extends `BasePage`
 - Ensure `load()` method navigates correctly
 
 ### TypeScript Errors in Page Objects
-- Add JSDoc annotations for IDE support
-- Use `@typedef` for complex types
-- Check `tsconfig.json` includes pages directory
+- Add explicit TypeScript parameter and return types
+- Export an `interface` or `type` for complex shapes
+- Run `npm run typecheck` to see every error at once
 
 ---
 

@@ -1,11 +1,7 @@
-const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
-const { assertMapVisible } = require('./assertions');
-
-/**
- * @typedef {import('../pages/WaradioPage')} WaradioPage
- */
+import { test, expect } from '@playwright/test';
+import { createWaradioPage } from '../pages';
+import { createTestSuite } from './test-utils';
+import { assertMapVisible } from './assertions';
 
 const waradioContext = createTestSuite({
   pageName: 'WARADIO',
@@ -44,7 +40,7 @@ test.describe('WARADIO App - Map and Legend', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(3000);
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(0);
   });
 
@@ -83,7 +79,7 @@ test.describe('WARADIO App - Map and Legend', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(5000);
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(5);
   });
 

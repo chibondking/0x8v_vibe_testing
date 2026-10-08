@@ -3,27 +3,83 @@
  * Reduces repetition across test files
  */
 
-const { expect } = require('@playwright/test');
+import { expect, type Locator, type Page } from '@playwright/test';
+
+/*
+ * Structural types for the page-object getters each assertion needs, so any
+ * page object with the right getters (WARADIO, GRID or LIVE) can be passed in.
+ */
+type Getter = () => Locator;
+
+export interface WaradioCheckboxes {
+  getRealTimeCheckbox: Getter;
+  getSlowPlotCheckbox: Getter;
+  getGapDetectionCheckbox: Getter;
+  getDeriveLocationCheckbox: Getter;
+  getBrighterMapCheckbox: Getter;
+}
+
+export interface GridCheckboxes {
+  getColorByBandCheckbox: Getter;
+  getBrightMapCheckbox: Getter;
+  getShowFieldsCheckbox: Getter;
+  getShowFieldLabelsCheckbox: Getter;
+}
+
+export interface LiveCheckboxes {
+  getColorByBandCheckbox: Getter;
+  getBrightMapCheckbox: Getter;
+  getDrawLinesCheckbox: Getter;
+}
+
+export interface PlaybackControls {
+  getPlayButton: Getter;
+  getPauseButton: Getter;
+  getResetButton: Getter;
+}
+
+export interface HeaderAndStatus {
+  getHeaderTitle: Getter;
+  getSystemStatus: Getter;
+}
+
+export interface HasMap {
+  getMap: Getter;
+}
+
+export interface DataInput {
+  getLoadDemoDataButton: Getter;
+  getMyGridInput: Getter;
+}
+
+export interface FooterStatus {
+  getStatusLeft: Getter;
+  getStatusRight: Getter;
+}
+
+export interface SpeedButtons {
+  getSpeedButton: (speed: string) => Locator;
+}
 
 /**
  * Standard mobile viewport size for responsive testing
  */
-const MOBILE_VIEWPORT = { width: 375, height: 667 };
+export const MOBILE_VIEWPORT = { width: 375, height: 667 };
 
 /**
  * Standard tablet viewport size
  */
-const TABLET_VIEWPORT = { width: 768, height: 1024 };
+export const TABLET_VIEWPORT = { width: 768, height: 1024 };
 
 /**
  * Standard desktop viewport size
  */
-const DESKTOP_VIEWPORT = { width: 1920, height: 1080 };
+export const DESKTOP_VIEWPORT = { width: 1920, height: 1080 };
 
 /**
  * Common panel titles across apps
  */
-const PANEL_TITLES = {
+export const PANEL_TITLES = {
   DATA_INPUT: 'DATA INPUT',
   PLAYBACK_CONTROL: 'PLAYBACK CONTROL',
   STATISTICS: 'STATISTICS',
@@ -34,7 +90,7 @@ const PANEL_TITLES = {
 /**
  * Contact field labels
  */
-const CONTACT_LABELS = {
+export const CONTACT_LABELS = {
   CALL: 'CALL:',
   LOCATION: 'LOCATION:',
   MODE: 'MODE:',
@@ -46,7 +102,7 @@ const CONTACT_LABELS = {
 /**
  * Default checkbox states for WARADIO
  */
-const WARADIO_CHECKBOX_DEFAULTS = {
+export const WARADIO_CHECKBOX_DEFAULTS = {
   realTime: true,
   slowPlot: false,
   gapDetection: true,
@@ -57,7 +113,7 @@ const WARADIO_CHECKBOX_DEFAULTS = {
 /**
  * Default checkbox states for GRID
  */
-const GRID_CHECKBOX_DEFAULTS = {
+export const GRID_CHECKBOX_DEFAULTS = {
   colorByBand: false,
   brightMap: false,
   showFields: true,
@@ -67,7 +123,7 @@ const GRID_CHECKBOX_DEFAULTS = {
 /**
  * Default checkbox states for LIVE
  */
-const LIVE_CHECKBOX_DEFAULTS = {
+export const LIVE_CHECKBOX_DEFAULTS = {
   colorByBand: true,
   brightMap: false,
   drawLines: true,
@@ -75,9 +131,8 @@ const LIVE_CHECKBOX_DEFAULTS = {
 
 /**
  * Assert all contact field labels are visible
- * @param {import('@playwright/test').Page} page
  */
-async function assertContactLabelsVisible(page) {
+export async function assertContactLabelsVisible(page: Page): Promise<void> {
   for (const [name, label] of Object.entries(CONTACT_LABELS)) {
     const locator = page.locator(`#contact-${name.toLowerCase()}`).locator('..').locator('.label');
     await expect(locator).toHaveText(label);
@@ -86,20 +141,16 @@ async function assertContactLabelsVisible(page) {
 
 /**
  * Assert panel title is visible and has correct text
- * @param {import('@playwright/test').Page} page
- * @param {string} panelSelector - CSS selector for the panel
- * @param {string} expectedTitle
  */
-async function assertPanelTitle(page, panelSelector, expectedTitle) {
+export async function assertPanelTitle(page: Page, panelSelector: string, expectedTitle: string): Promise<void> {
   const panel = page.locator(panelSelector);
   await expect(panel.locator('.panel-title, .section-title, h2, h3').first()).toHaveText(expectedTitle);
 }
 
 /**
  * Assert all WARADIO checkbox default states
- * @param {object} pageObject - Page object with checkbox getters
  */
-async function assertWaradioCheckboxDefaults(pageObject) {
+export async function assertWaradioCheckboxDefaults(pageObject: WaradioCheckboxes): Promise<void> {
   await expect(pageObject.getRealTimeCheckbox()).toBeChecked();
   await expect(pageObject.getSlowPlotCheckbox()).not.toBeChecked();
   await expect(pageObject.getGapDetectionCheckbox()).toBeChecked();
@@ -109,9 +160,8 @@ async function assertWaradioCheckboxDefaults(pageObject) {
 
 /**
  * Assert all GRID checkbox default states
- * @param {object} pageObject - Page object with checkbox getters
  */
-async function assertGridCheckboxDefaults(pageObject) {
+export async function assertGridCheckboxDefaults(pageObject: GridCheckboxes): Promise<void> {
   await expect(pageObject.getColorByBandCheckbox()).not.toBeChecked();
   await expect(pageObject.getBrightMapCheckbox()).not.toBeChecked();
   await expect(pageObject.getShowFieldsCheckbox()).toBeChecked();
@@ -120,9 +170,8 @@ async function assertGridCheckboxDefaults(pageObject) {
 
 /**
  * Assert all LIVE checkbox default states
- * @param {object} pageObject - Page object with checkbox getters
  */
-async function assertLiveCheckboxDefaults(pageObject) {
+export async function assertLiveCheckboxDefaults(pageObject: LiveCheckboxes): Promise<void> {
   await expect(pageObject.getColorByBandCheckbox()).toBeChecked();
   await expect(pageObject.getBrightMapCheckbox()).not.toBeChecked();
   await expect(pageObject.getDrawLinesCheckbox()).toBeChecked();
@@ -130,9 +179,8 @@ async function assertLiveCheckboxDefaults(pageObject) {
 
 /**
  * Assert playback buttons are in correct initial state (disabled)
- * @param {object} pageObject - Page object with button getters
  */
-async function assertPlaybackButtonsDisabled(pageObject) {
+export async function assertPlaybackButtonsDisabled(pageObject: PlaybackControls): Promise<void> {
   await expect(pageObject.getPlayButton()).toBeDisabled();
   await expect(pageObject.getPauseButton()).toBeDisabled();
   await expect(pageObject.getResetButton()).toBeDisabled();
@@ -140,28 +188,23 @@ async function assertPlaybackButtonsDisabled(pageObject) {
 
 /**
  * Assert header and status are visible
- * @param {object} pageObject - Page object with header getters
- * @param {string} expectedHeaderText
  */
-async function assertHeaderAndStatus(pageObject, expectedHeaderText) {
+export async function assertHeaderAndStatus(pageObject: HeaderAndStatus, expectedHeaderText: string): Promise<void> {
   await expect(pageObject.getHeaderTitle()).toHaveText(expectedHeaderText);
   await expect(pageObject.getSystemStatus()).toBeVisible();
 }
 
 /**
  * Assert map is visible
- * @param {object} pageObject - Page object with map getter
  */
-async function assertMapVisible(pageObject) {
+export async function assertMapVisible(pageObject: HasMap): Promise<void> {
   await expect(pageObject.getMap()).toBeVisible();
 }
 
 /**
  * Set mobile viewport and optionally reload page
- * @param {import('@playwright/test').Page} page
- * @param {boolean} reload - Whether to reload after viewport change
  */
-async function setMobileViewport(page, reload = false) {
+export async function setMobileViewport(page: Page, reload = false): Promise<void> {
   await page.setViewportSize(MOBILE_VIEWPORT);
   if (reload) {
     await page.reload({ waitUntil: 'networkidle' });
@@ -170,34 +213,30 @@ async function setMobileViewport(page, reload = false) {
 
 /**
  * Set tablet viewport
- * @param {import('@playwright/test').Page} page
  */
-async function setTabletViewport(page) {
+export async function setTabletViewport(page: Page): Promise<void> {
   await page.setViewportSize(TABLET_VIEWPORT);
 }
 
 /**
  * Set desktop viewport
- * @param {import('@playwright/test').Page} page
  */
-async function setDesktopViewport(page) {
+export async function setDesktopViewport(page: Page): Promise<void> {
   await page.setViewportSize(DESKTOP_VIEWPORT);
 }
 
 /**
  * Assert all data input elements are visible
- * @param {object} pageObject - Page object with input getters
  */
-async function assertDataInputVisible(pageObject) {
+export async function assertDataInputVisible(pageObject: DataInput): Promise<void> {
   await expect(pageObject.getLoadDemoDataButton()).toBeVisible();
   await expect(pageObject.getMyGridInput()).toBeVisible();
 }
 
 /**
  * Assert playback controls are visible
- * @param {object} pageObject - Page object with playback getters
  */
-async function assertPlaybackControlsVisible(pageObject) {
+export async function assertPlaybackControlsVisible(pageObject: PlaybackControls): Promise<void> {
   await expect(pageObject.getPlayButton()).toBeVisible();
   await expect(pageObject.getPauseButton()).toBeVisible();
   await expect(pageObject.getResetButton()).toBeVisible();
@@ -205,18 +244,16 @@ async function assertPlaybackControlsVisible(pageObject) {
 
 /**
  * Assert footer status elements are visible
- * @param {object} pageObject - Page object with status getters
  */
-async function assertFooterStatusVisible(pageObject) {
+export async function assertFooterStatusVisible(pageObject: FooterStatus): Promise<void> {
   await expect(pageObject.getStatusLeft()).toBeVisible();
   await expect(pageObject.getStatusRight()).toBeVisible();
 }
 
 /**
  * Assert speed buttons are visible with correct labels
- * @param {object} pageObject - Page object with speed button getters
  */
-async function assertSpeedButtonsVisible(pageObject) {
+export async function assertSpeedButtonsVisible(pageObject: SpeedButtons): Promise<void> {
   const speeds = ['0.5', '1', '2', '4'];
   for (const speed of speeds) {
     await expect(pageObject.getSpeedButton(speed)).toHaveText(`${speed}x`);
@@ -225,63 +262,21 @@ async function assertSpeedButtonsVisible(pageObject) {
 
 /**
  * Wait for page to be fully loaded (network idle)
- * @param {import('@playwright/test').Page} page
- * @param {number} timeout
  */
-async function waitForPageLoad(page, timeout = 30000) {
+export async function waitForPageLoad(page: Page, timeout = 30000): Promise<void> {
   await page.waitForLoadState('networkidle', { timeout });
 }
 
 /**
  * Assert element is attached to DOM (exists but may not be visible)
- * @param {import('@playwright/test').Locator} locator
  */
-async function assertAttached(locator) {
+export async function assertAttached(locator: Locator): Promise<void> {
   await expect(locator).toBeAttached();
 }
 
 /**
  * Assert element is not attached (removed from DOM)
- * @param {import('@playwright/test').Locator} locator
  */
-async function assertNotAttached(locator) {
+export async function assertNotAttached(locator: Locator): Promise<void> {
   await expect(locator).not.toBeAttached();
 }
-
-module.exports = {
-  // Viewports
-  MOBILE_VIEWPORT,
-  TABLET_VIEWPORT,
-  DESKTOP_VIEWPORT,
-
-  // Constants
-  PANEL_TITLES,
-  CONTACT_LABELS,
-  WARADIO_CHECKBOX_DEFAULTS,
-  GRID_CHECKBOX_DEFAULTS,
-  LIVE_CHECKBOX_DEFAULTS,
-
-  // Assertions
-  assertContactLabelsVisible,
-  assertPanelTitle,
-  assertWaradioCheckboxDefaults,
-  assertGridCheckboxDefaults,
-  assertLiveCheckboxDefaults,
-  assertPlaybackButtonsDisabled,
-  assertHeaderAndStatus,
-  assertMapVisible,
-  assertDataInputVisible,
-  assertPlaybackControlsVisible,
-  assertFooterStatusVisible,
-  assertSpeedButtonsVisible,
-
-  // Viewport helpers
-  setMobileViewport,
-  setTabletViewport,
-  setDesktopViewport,
-
-  // General helpers
-  waitForPageLoad,
-  assertAttached,
-  assertNotAttached,
-};

@@ -1,10 +1,10 @@
-const { test, expect, chromium } = require('@playwright/test');
-const path = require('path');
-const { createWaradioPage } = require('../pages');
+import { test, expect, chromium, type Page } from '@playwright/test';
+import path from 'node:path';
+import { createWaradioPage, type WaradioPage } from '../pages';
 
 test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
-  let page;
-  let waradioPage;
+  let page: Page;
+  let waradioPage: WaradioPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -38,7 +38,7 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     
     await page.waitForTimeout(10000);
     
-    const fileInfo = await waradioPage.getFileInfo().textContent();
+    const fileInfo = (await waradioPage.getFileInfo().textContent()) ?? '';
     expect(fileInfo).toContain('Loaded');
   });
 
@@ -65,7 +65,7 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     
     await page.waitForTimeout(3000);
     
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(0);
     
     const contact = await waradioPage.getCurrentContact();
@@ -79,7 +79,7 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     
     await page.waitForTimeout(5000);
     
-    const fileInfo = await waradioPage.getFileInfo().textContent();
+    const fileInfo = (await waradioPage.getFileInfo().textContent()) ?? '';
     expect(fileInfo).toContain('Error');
   });
 
@@ -90,7 +90,7 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     
     await page.waitForTimeout(5000);
     
-    const fileInfo = await waradioPage.getFileInfo().textContent();
+    const fileInfo = (await waradioPage.getFileInfo().textContent()) ?? '';
     expect(fileInfo).toContain('No contacts');
   });
 
@@ -99,7 +99,7 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
     
-    const demoPlotted = await waradioPage.getPlottedContacts().textContent();
+    const demoPlotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     
     await waradioPage.clickReset();
     await page.waitForTimeout(500);
@@ -111,8 +111,9 @@ test.describe('WARADIO App - ADIF File Loading (Manual Review)', () => {
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
     
-    const adifPlotted = await waradioPage.getPlottedContacts().textContent();
+    const adifPlotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     
+    expect(parseInt(demoPlotted)).toBeGreaterThan(0);
     expect(parseInt(adifPlotted)).toBeGreaterThan(0);
   });
 

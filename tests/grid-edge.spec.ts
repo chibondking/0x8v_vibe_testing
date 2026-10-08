@@ -1,11 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createGridPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
-const { MOBILE_VIEWPORT } = require('./assertions');
-
-/**
- * @typedef {import('../pages/GridPage')} GridPageType
- */
+import { test, expect } from '@playwright/test';
+import { createGridPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const gridContext = createTestSuite({
   pageName: 'GRID',
@@ -118,8 +113,8 @@ test.describe('GRID App - ADIF Loading (Skipped)', () => {
     const gridPage = gridContext.getPageObject();
     await gridPage.getAdifFileInput().setInputFiles('tests/fixtures/test.adif');
     await gridPage.waitForDataLoaded();
-    const total = await gridPage.getTotalContacts();
-    expect(total).toBeGreaterThan(0);
+    const total = await gridPage.textOf(gridPage.getTotalContacts());
+    expect(parseInt(total)).toBeGreaterThan(0);
   });
 
   test.skip('displays file info after loading ADIF', async () => {
@@ -172,7 +167,8 @@ test.describe('GRID App - ADIF Loading (Skipped)', () => {
     await gridPage.waitForDataLoaded();
     const adifStats = await gridPage.getStatistics();
 
-    expect(adifStats.total).toBeGreaterThan(0);
+    expect(parseInt(demoStats.total)).toBeGreaterThan(0);
+    expect(parseInt(adifStats.total)).toBeGreaterThan(0);
   });
 
   test.skip('MY_GRIDSQUARE from ADIF populates grid input', async () => {

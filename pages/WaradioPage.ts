@@ -1,198 +1,160 @@
-const BasePage = require('./BasePage');
-const { getAppUrl } = require('../config');
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { getAppUrl } from '../config';
 
-/** @typedef {import('@playwright/test').Page} Page */
+export class WaradioPage extends BasePage {
+  readonly appName = 'waradio';
+  readonly appUrl: string;
 
-class WaradioPage extends BasePage {
-  /** @param {Page} page */
-  constructor(page) {
+  constructor(page: Page) {
     super(page, getAppUrl('waradio'));
-    this.appName = 'waradio';
     this.appUrl = getAppUrl('waradio');
   }
 
-  async load() {
+  async load(): Promise<this> {
     await this.goto('/');
     return this;
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeaderTitle() {
+  getHeaderTitle(): Locator {
     return this.page.locator('.header-left h1');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSystemStatus() {
+  getSystemStatus(): Locator {
     return this.page.locator('#system-status');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTimestampDisplay() {
+  getTimestampDisplay(): Locator {
     return this.page.locator('#timestamp-display');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getDataInputSection() {
+  getDataInputSection(): Locator {
     return this.page.locator('.control-panel .panel-section').first();
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getAdifFileInput() {
+  getAdifFileInput(): Locator {
     return this.page.locator('#adif-file');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getLoadDemoDataButton() {
+  getLoadDemoDataButton(): Locator {
     return this.page.locator('#btn-demo');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getFileInfo() {
+  getFileInfo(): Locator {
     return this.page.locator('#file-info');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMyGridInput() {
+  getMyGridInput(): Locator {
     return this.page.locator('#my-grid');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getPlaybackSection() {
+  getPlaybackSection(): Locator {
     return this.page.locator('.panel-section').nth(1);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getPlayButton() {
+  getPlayButton(): Locator {
     return this.page.locator('#btn-play');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getPauseButton() {
+  getPauseButton(): Locator {
     return this.page.locator('#btn-pause');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getResetButton() {
+  getResetButton(): Locator {
     return this.page.locator('#btn-reset');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSpeedButtons() {
+  getSpeedButtons(): Locator {
     return this.page.locator('.speed-btn');
   }
 
-  /**
-   * @param {string} speed
-   * @returns {import('@playwright/test').Locator}
-   */
-  getSpeedButton(speed) {
+  getSpeedButton(speed: string): Locator {
     return this.page.locator(`.speed-btn[data-speed="${speed}"]`);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getRealTimeCheckbox() {
+  getRealTimeCheckbox(): Locator {
     return this.page.locator('#real-time-mode');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSlowPlotCheckbox() {
+  getSlowPlotCheckbox(): Locator {
     return this.page.locator('#slow-plot-mode');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getGapDetectionCheckbox() {
+  getGapDetectionCheckbox(): Locator {
     return this.page.locator('#gap-detection');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getDeriveLocationCheckbox() {
+  getDeriveLocationCheckbox(): Locator {
     return this.page.locator('#use-state-location');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getBrighterMapCheckbox() {
+  getBrighterMapCheckbox(): Locator {
     return this.page.locator('#bright-map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatisticsSection() {
+  getStatisticsSection(): Locator {
     return this.page.locator('.panel-section').nth(2);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTotalContacts() {
+  getTotalContacts(): Locator {
     return this.page.locator('#stat-total');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getPlottedContacts() {
+  getPlottedContacts(): Locator {
     return this.page.locator('#stat-plotted');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getRemainingContacts() {
+  getRemainingContacts(): Locator {
     return this.page.locator('#stat-remaining');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTimeElapsed() {
+  getTimeElapsed(): Locator {
     return this.page.locator('#stat-elapsed');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getCurrentContactSection() {
+  getCurrentContactSection(): Locator {
     return this.page.locator('.panel-section').nth(3);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactCallsign() {
+  getContactCallsign(): Locator {
     return this.page.locator('#contact-call');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactLocation() {
+  getContactLocation(): Locator {
     return this.page.locator('#contact-location');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactMode() {
+  getContactMode(): Locator {
     return this.page.locator('#contact-mode');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactBand() {
+  getContactBand(): Locator {
     return this.page.locator('#contact-band');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactDistance() {
+  getContactDistance(): Locator {
     return this.page.locator('#contact-distance');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getContactGrid() {
+  getContactGrid(): Locator {
     return this.page.locator('#contact-grid');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMap() {
+  getMap(): Locator {
     return this.page.locator('#map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getBandLegend() {
+  getBandLegend(): Locator {
     return this.page.locator('#band-legend');
   }
 
-  /** @returns {Promise<WaradioPage>} */
-  async loadDemoData() {
+  async loadDemoData(): Promise<WaradioPage> {
     await this.getLoadDemoDataButton().click();
     await this.waitForPlaybackEnabled();
     return this;
   }
 
-  /** @returns {Promise<WaradioPage>} */
-  async disableRealTimeMode() {
+  async disableRealTimeMode(): Promise<WaradioPage> {
     const checkbox = this.getRealTimeCheckbox();
     if (await checkbox.isChecked()) {
       await checkbox.click();
@@ -200,41 +162,32 @@ class WaradioPage extends BasePage {
     return this;
   }
 
-  /** @returns {Promise<WaradioPage>} */
-  async clickPlay() {
+  async clickPlay(): Promise<WaradioPage> {
     await this.getPlayButton().click();
     return this;
   }
 
-  /** @returns {Promise<WaradioPage>} */
-  async clickPause() {
+  async clickPause(): Promise<WaradioPage> {
     await this.getPauseButton().click();
     return this;
   }
 
-  /** @returns {Promise<WaradioPage>} */
-  async clickReset() {
+  async clickReset(): Promise<WaradioPage> {
     await this.getResetButton().click();
     return this;
   }
 
-  /**
-   * @param {string} speed
-   * @returns {Promise<WaradioPage>}
-   */
-  async setSpeed(speed) {
+  async setSpeed(speed: string): Promise<WaradioPage> {
     await this.getSpeedButton(speed).click();
     return this;
   }
 
-  /** @returns {Promise<string>} */
-  async getCurrentSpeed() {
+  async getCurrentSpeed(): Promise<string> {
     const activeBtn = this.page.locator('.speed-btn.active');
     return await activeBtn.getAttribute('data-speed') || '';
   }
 
-  /** @returns {Promise<boolean>} */
-  async waitForPlaybackEnabled() {
+  async waitForPlaybackEnabled(): Promise<boolean> {
     try {
       await this.page.waitForFunction(() => {
         const playBtn = document.getElementById('btn-play') as HTMLButtonElement;
@@ -247,53 +200,46 @@ class WaradioPage extends BasePage {
     }
   }
 
-  /** @returns {Promise<{total: string, plotted: string, remaining: string, elapsed: string}>} */
-  async getStatistics() {
+  async getStatistics(): Promise<{total: string, plotted: string, remaining: string, elapsed: string}> {
     return {
-      total: await this.getTotalContacts().textContent(),
-      plotted: await this.getPlottedContacts().textContent(),
-      remaining: await this.getRemainingContacts().textContent(),
-      elapsed: await this.getTimeElapsed().textContent(),
+      total: await this.textOf(this.getTotalContacts()),
+      plotted: await this.textOf(this.getPlottedContacts()),
+      remaining: await this.textOf(this.getRemainingContacts()),
+      elapsed: await this.textOf(this.getTimeElapsed()),
     };
   }
 
-  /** @returns {Promise<{callsign: string, location: string, mode: string, band: string, distance: string, grid: string}>} */
-  async getCurrentContact() {
+  async getCurrentContact(): Promise<{callsign: string, location: string, mode: string, band: string, distance: string, grid: string}> {
     return {
-      callsign: await this.getContactCallsign().textContent(),
-      location: await this.getContactLocation().textContent(),
-      mode: await this.getContactMode().textContent(),
-      band: await this.getContactBand().textContent(),
-      distance: await this.getContactDistance().textContent(),
-      grid: await this.getContactGrid().textContent(),
+      callsign: await this.textOf(this.getContactCallsign()),
+      location: await this.textOf(this.getContactLocation()),
+      mode: await this.textOf(this.getContactMode()),
+      band: await this.textOf(this.getContactBand()),
+      distance: await this.textOf(this.getContactDistance()),
+      grid: await this.textOf(this.getContactGrid()),
     };
   }
 
-  /** @returns {Promise<boolean>} */
-  async isRealTimeChecked() {
+  async isRealTimeChecked(): Promise<boolean> {
     return await this.getRealTimeCheckbox().isChecked();
   }
 
-  /** @returns {Promise<boolean>} */
-  async isGapDetectionChecked() {
+  async isGapDetectionChecked(): Promise<boolean> {
     return await this.getGapDetectionCheckbox().isChecked();
   }
 
-  /** @returns {Promise<boolean>} */
-  async isDeriveLocationChecked() {
+  async isDeriveLocationChecked(): Promise<boolean> {
     return await this.getDeriveLocationCheckbox().isChecked();
   }
 
-  /** @returns {Promise<import('@playwright/test').Locator>} */
-  async getMapMarkers() {
+  async getMapMarkers(): Promise<Locator> {
     return this.page.locator('.leaflet-marker-icon, .leaflet-circle-marker');
   }
 
-  /** @returns {Promise<number>} */
-  async getMapMarkerCount() {
+  async getMapMarkerCount(): Promise<number> {
     const markers = await this.getMapMarkers();
     return await markers.count();
   }
 }
 
-module.exports = WaradioPage;
+export default WaradioPage;

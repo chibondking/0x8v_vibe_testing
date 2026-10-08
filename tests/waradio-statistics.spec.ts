@@ -1,6 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
+import { test, expect } from '@playwright/test';
+import { createWaradioPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const waradioContext = createTestSuite({
   pageName: 'WARADIO',
@@ -26,7 +26,7 @@ test.describe('WARADIO App - Statistics', () => {
 
   test('plotted starts at 0', async () => {
     const waradioPage = waradioContext.getPageObject();
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBe(0);
   });
 
@@ -41,7 +41,7 @@ test.describe('WARADIO App - Statistics', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(0);
   });
 
@@ -64,10 +64,10 @@ test.describe('WARADIO App - Statistics', () => {
   test('time elapsed updates during playback', async () => {
     const waradioPage = waradioContext.getPageObject();
     const page = waradioContext.getPage();
-    const elapsedBefore = await waradioPage.getTimeElapsed().textContent();
+    const elapsedBefore = (await waradioPage.getTimeElapsed().textContent()) ?? '';
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
-    const elapsedAfter = await waradioPage.getTimeElapsed().textContent();
+    const elapsedAfter = (await waradioPage.getTimeElapsed().textContent()) ?? '';
     expect(elapsedAfter).not.toBe(elapsedBefore);
   });
 
@@ -76,7 +76,7 @@ test.describe('WARADIO App - Statistics', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
-    const distance = await waradioPage.getContactDistance().textContent();
+    const distance = (await waradioPage.getContactDistance().textContent()) ?? '';
     expect(distance).not.toBe('--');
     expect(parseFloat(distance.replace(/[^0-9.]/g, ''))).toBeGreaterThan(0);
   });
@@ -87,7 +87,7 @@ test.describe('WARADIO App - Statistics', () => {
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
     await waradioPage.clickReset();
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBe(0);
   });
 
@@ -108,7 +108,7 @@ test.describe('WARADIO App - Statistics', () => {
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
     await waradioPage.clickReset();
-    const elapsed = await waradioPage.getTimeElapsed().textContent();
+    const elapsed = (await waradioPage.getTimeElapsed().textContent()) ?? '';
     expect(elapsed).toBe('00:00:00');
   });
 
@@ -116,9 +116,9 @@ test.describe('WARADIO App - Statistics', () => {
     const waradioPage = waradioContext.getPageObject();
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
-    const plotted1 = await waradioPage.getPlottedContacts().textContent();
+    const plotted1 = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     await page.waitForTimeout(1000);
-    const plotted2 = await waradioPage.getPlottedContacts().textContent();
+    const plotted2 = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted2)).toBeGreaterThan(parseInt(plotted1));
   });
 });

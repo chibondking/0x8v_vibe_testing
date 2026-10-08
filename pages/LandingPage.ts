@@ -1,24 +1,21 @@
-const BasePage = require('./BasePage');
-const { getAppUrl, getAppsConfig, CONFIG } = require('../config');
+import https from 'node:https';
+import type { Page } from '@playwright/test';
+import { BasePage, type Link } from './BasePage';
+import { getAppUrl, getAppsConfig, CONFIG } from '../config';
 
-/**
- * @typedef {import('@playwright/test').Page} Page
- * @typedef {Object} Link
- * @property {string} url
- * @property {string} text
- * @property {string} href
- */
+export interface AppLinkStatus {
+  appName: string;
+  url: string;
+  status: number;
+  passed: boolean;
+}
 
-class LandingPage extends BasePage {
-  /** @param {Page} page */
-  constructor(page) {
+export class LandingPage extends BasePage {
+  constructor(page: Page) {
     super(page, CONFIG.baseUrl);
   }
 
-  /**
-   * @returns {Promise<Link[]>}
-   */
-  async getAppLinks() {
+  async getAppLinks(): Promise<Link[]> {
     const links = await this.getAllLinks();
     const appsConfig = getAppsConfig();
     const appUrls = appsConfig.map(app => getAppUrl(app.name));
@@ -28,30 +25,21 @@ class LandingPage extends BasePage {
     );
   }
 
-  /**
-   * @param {string} appName
-   * @returns {Promise<Link | undefined>}
-   */
-  async getAppLink(appName) {
+  async getAppLink(appName: string): Promise<Link | undefined> {
     const targetUrl = getAppUrl(appName);
     const links = await this.getAllLinks();
     return links.find(link => link.url.startsWith(targetUrl));
   }
 
-  /**
-   * @returns {Promise<Array<{appName: string, url: string, status: number, passed: boolean}>>}
-   */
-  async verifyAllAppLinks() {
-    const results = [];
+  async verifyAllAppLinks(): Promise<AppLinkStatus[]> {
+    const results: AppLinkStatus[] = [];
     const appsConfig = getAppsConfig();
-
-    const https = require('https');
 
     for (const app of appsConfig) {
       const appUrl = getAppUrl(app.name);
-      const status = await new Promise((resolve) => {
+      const status = await new Promise<number>((resolve) => {
         const req = https.get(appUrl, (res) => {
-          resolve(res.statusCode);
+          resolve(res.statusCode ?? 0);
         });
         req.on('error', () => resolve(0));
         req.setTimeout(10000, () => {
@@ -71,22 +59,16 @@ class LandingPage extends BasePage {
     return results;
   }
 
-  /** @returns {Promise<import('@playwright/test').AriaSnapshot>} */
-  async getAriaSnapshot() {
+  async getAriaSnapshot(): Promise<string> {
     return this.page.locator('body').ariaSnapshot();
   }
 
-  /**
-   * @param {import('@playwright/test').AriaSnapshot} expectedSnapshot
-   * @returns {Promise<boolean>}
-   */
-  async verifyAriaSnapshot(expectedSnapshot) {
+  async verifyAriaSnapshot(expectedSnapshot: string): Promise<boolean> {
     const actualSnapshot = await this.getAriaSnapshot();
     return JSON.stringify(actualSnapshot, null, 2) === JSON.stringify(expectedSnapshot, null, 2);
   }
 
-  /** @returns {Promise<import('@playwright/test').AriaSnapshot>} */
-  async takeAndLogAriaSnapshot() {
+  async takeAndLogAriaSnapshot(): Promise<string> {
     const snapshot = await this.getAriaSnapshot();
     console.log('  Aria Snapshot:');
     console.log(JSON.stringify(snapshot, null, 2));
@@ -94,4 +76,4 @@ class LandingPage extends BasePage {
   }
 }
 
-module.exports = LandingPage;
+export default LandingPage;

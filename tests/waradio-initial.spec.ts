@@ -1,19 +1,13 @@
-const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
-const { createTestSuite, closeBrowser } = require('./test-utils');
-const {
+import { test, expect } from '@playwright/test';
+import { createWaradioPage } from '../pages';
+import { createTestSuite } from './test-utils';
+import {
   assertHeaderAndStatus,
   assertDataInputVisible,
   assertPlaybackControlsVisible,
   assertPlaybackButtonsDisabled,
   assertMapVisible,
-  assertFooterStatusVisible,
-  CONTACT_LABELS,
-} = require('./assertions');
-
-/**
- * @typedef {import('../pages/WaradioPage')} WaradioPage
- */
+} from './assertions';
 
 const waradioContext = createTestSuite({
   pageName: 'WARADIO',

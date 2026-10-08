@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "module": "commonjs",
-    "lib": ["ES2020", "DOM"],
-    "outDir": "./dist",
-    "rootDir": ".",
-    "strict": false,
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false
+    "noUnusedLocals": true
   },
-  "include": ["pages/**/*", "config/**/*"],
-  "exclude": ["node_modules", "dist", "tests/**/*"]
+  "include": ["pages/**/*.ts", "config/**/*.ts", "tests/**/*.ts", "playwright.config.ts"]
 }

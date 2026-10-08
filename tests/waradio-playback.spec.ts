@@ -1,10 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
-
-/**
- * @typedef {import('../pages/WaradioPage')} WaradioPage
- */
+import { test, expect } from '@playwright/test';
+import { createWaradioPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const waradioContext = createTestSuite({
   pageName: 'WARADIO',
@@ -50,7 +46,7 @@ test.describe('WARADIO App - Happy Path Playback', () => {
     await expect(waradioPage.getPlayButton()).toBeDisabled();
     await expect(waradioPage.getPauseButton()).toBeEnabled();
     await page.waitForTimeout(2000);
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(0);
   });
 
@@ -59,7 +55,7 @@ test.describe('WARADIO App - Happy Path Playback', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBeGreaterThan(0);
   });
 
@@ -79,9 +75,9 @@ test.describe('WARADIO App - Happy Path Playback', () => {
     const page = waradioContext.getPage();
     await waradioPage.clickPlay();
     await page.waitForTimeout(2000);
-    const plottedBeforePause = await waradioPage.getPlottedContacts().textContent();
+    const plottedBeforePause = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     await waradioPage.clickPause();
-    const plottedAfterPause = await waradioPage.getPlottedContacts().textContent();
+    const plottedAfterPause = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plottedBeforePause)).toBeGreaterThan(0);
     expect(parseInt(plottedAfterPause)).toEqual(parseInt(plottedBeforePause));
   });
@@ -94,7 +90,7 @@ test.describe('WARADIO App - Happy Path Playback', () => {
     await waradioPage.clickReset();
     await expect(waradioPage.getPlayButton()).toBeEnabled();
     await expect(waradioPage.getPauseButton()).toBeDisabled();
-    const plotted = await waradioPage.getPlottedContacts().textContent();
+    const plotted = (await waradioPage.getPlottedContacts().textContent()) ?? '';
     expect(parseInt(plotted)).toBe(0);
     const contact = await waradioPage.getCurrentContact();
     expect(contact.callsign).toBe('--');

@@ -1,16 +1,12 @@
-const { test, expect } = require('@playwright/test');
-const { createGridPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
-const {
+import { test, expect } from '@playwright/test';
+import { createGridPage } from '../pages';
+import { createTestSuite } from './test-utils';
+import {
   assertHeaderAndStatus,
   assertDataInputVisible,
   assertFooterStatusVisible,
   assertMapVisible,
-} = require('./assertions');
-
-/**
- * @typedef {import('../pages/GridPage')} GridPage
- */
+} from './assertions';
 
 const gridContext = createTestSuite({
   pageName: 'GRID',

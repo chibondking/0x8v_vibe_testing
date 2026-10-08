@@ -1,36 +1,34 @@
-const BasePage = require('./BasePage');
-const { shouldSkipLink } = require('../config');
+import http from 'node:http';
+import https from 'node:https';
+import type { Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { shouldSkipLink } from '../config';
 
-/**
- * @typedef {import('@playwright/test').Page} Page
- * @typedef {Object} LinkCheckResult
- * @property {string} appName
- * @property {string} appUrl
- * @property {number} totalLinks
- * @property {Array<{url: string, text: string, reason?: string}>} skippedLinks
- * @property {Array<{url: string, text: string, status: number}>} brokenLinks
- * @property {boolean} passed
- */
+export interface LinkCheckResult {
+  appName: string;
+  appUrl: string;
+  totalLinks: number;
+  skippedLinks: Array<{ url: string; text: string; reason?: string | null }>;
+  brokenLinks: Array<{ url: string; text: string; status: number }>;
+  passed: boolean;
+}
 
-class AppPage extends BasePage {
-  /**
-   * @param {Page} page
-   * @param {string} appName
-   * @param {string} appUrl
-   */
-  constructor(page, appName, appUrl) {
+export class AppPage extends BasePage {
+  readonly appName: string;
+  readonly appUrl: string;
+
+  constructor(page: Page, appName: string, appUrl: string) {
     super(page, appUrl);
     this.appName = appName;
     this.appUrl = appUrl;
   }
 
-  async load() {
+  async load(): Promise<this> {
     await this.goto('/');
     return this;
   }
 
-  /** @returns {LinkCheckResult} */
-  getLinkCheckResults() {
+  getLinkCheckResults(): LinkCheckResult {
     return {
       appName: this.appName,
       appUrl: this.appUrl,
@@ -41,8 +39,7 @@ class AppPage extends BasePage {
     };
   }
 
-  /** @returns {Promise<LinkCheckResult>} */
-  async checkAllLinks() {
+  async checkAllLinks(): Promise<LinkCheckResult> {
     const result = this.getLinkCheckResults();
     const applicableLinks = await this.getApplicableLinks();
     result.totalLinks = applicableLinks.length;
@@ -56,14 +53,11 @@ class AppPage extends BasePage {
 
     const testableLinks = await this.getTestableLinks();
 
-    const https = require('https');
-    const http = require('http');
-
     for (const link of testableLinks) {
-      const status = await new Promise((resolve) => {
+      const status = await new Promise<number>((resolve) => {
         const protocol = link.url.startsWith('https') ? https : http;
         const req = protocol.get(link.url, (res) => {
-          resolve(res.statusCode);
+          resolve(res.statusCode ?? 0);
         });
         req.on('error', () => resolve(0));
         req.setTimeout(10000, () => {
@@ -87,4 +81,4 @@ class AppPage extends BasePage {
   }
 }
 
-module.exports = AppPage;
+export default AppPage;

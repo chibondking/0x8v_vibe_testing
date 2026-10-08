@@ -18,19 +18,21 @@ Uses **Page Object Model (POM)** pattern with centralized URL configuration.
 
 ```
 config/
-  index.js              # Centralized configuration with env var support
+  index.ts              # Centralized configuration with env var support
 pages/
-  BasePage.js           # Base page object with common methods
+  BasePage.ts           # Base page object with common methods
   LandingPage.ts        # Page object for VIBE landing page
   AppPage.ts            # Generic app page object
   WaradioPage.ts        # Page object for WARADIO ADIF Log Visualizer
   GridPage.ts           # Page object for GRID Square Visualizer
   LivePage.ts           # Page object for LIVE FT8 Live Map
-  index.js              # Page factory (create*Page functions)
+  index.ts              # Page factory (create*Page functions)
 tests/
-  test-utils.js         # Shared test utilities (browser setup, context)
+  test-utils.ts         #
+  assertions.ts         # Shared assertions, viewports and page-object interfaces
+  Shared test utilities (browser setup, context)
   vibe.spec.ts          # Landing page tests
-  live.spec.ts          # LIVE app tests (uses test-utils.js)
+  live.spec.ts          # LIVE app tests (uses test-utils.ts)
   grid*.spec.ts         # GRID app tests (initial, happy, edge, uiux)
   waradio*.spec.ts      # WARADIO app tests (initial, playback, etc.)
   broken-links.spec.ts  # HTTP link verification
@@ -39,27 +41,26 @@ playwright.config.ts   # Playwright config with env var support
 
 ### TypeScript Page Objects
 
-All page objects are written in **TypeScript** (.ts) with JSDoc annotations:
+The whole suite (page objects, config, helpers and specs) is TypeScript with ES module imports:
 
 ```typescript
-/** @returns {import('@playwright/test').Locator} */
-getHeaderTitle() {
+getHeaderTitle(): Locator {
   return this.page.locator('h1');
 }
 ```
 
 TypeScript features:
-- `Page` type from Playwright for browser page
-- `Locator` return types for UI element getters
-- Parameter types for action methods
-- Strict mode disabled for incremental adoption
+- `Page` and `Locator` types from Playwright on every page-object method
+- Typed return values for data readers (e.g. `getStatistics(): Promise<{ total: string; ... }>`)
+- Structural interfaces in `tests/assertions.ts`, so shared assertions accept any page object with the right getters
+- `strict` mode on, checked in CI with `npm run typecheck`
 
 ### Shared Test Utilities
 
-Browser lifecycle management is DRY via `tests/test-utils.js`:
+Browser lifecycle management is DRY via `tests/test-utils.ts`:
 
-```javascript
-const { createTestSuite } = require('./test-utils');
+```typescript
+import { createTestSuite } from './test-utils';
 
 const liveContext = createTestSuite({
   pageName: 'Live',
@@ -85,10 +86,10 @@ Available utilities:
 
 ### Configuration Pattern
 
-All URLs centralized via `config/index.js` and `playwright.config.ts`:
+All URLs centralized via `config/index.ts` and `playwright.config.ts`:
 
-```javascript
-const { getAppUrl } = require('./config');
+```typescript
+import { getAppUrl } from './config';
 const url = getAppUrl('waradio'); // Uses env vars or defaults
 ```
 
@@ -98,7 +99,7 @@ Environment variables:
 
 ## Configuration
 
-All URLs and apps are configured in `config/index.js`:
+All URLs and apps are configured in `config/index.ts`:
 
 ```javascript
 const CONFIG = {
@@ -134,7 +135,7 @@ npm test
 | `BASE_URL` | `https://vibe.0x8v.io` | Landing page URL |
 | `DOMAIN` | `0x8v.io` | Domain for app URLs (e.g., `waradio.{DOMAIN}`) |
 
-To add/remove apps, edit the `apps` array in `config/index.js`.
+To add/remove apps, edit the `apps` array in `config/index.ts`.
 
 ## Applications Tested
 
@@ -146,12 +147,13 @@ To add/remove apps, edit the `apps` array in `config/index.js`.
 
 ```bash
 npm test                    # Run all tests (parallel, fast)
-npm run test:fast           # Run tests excluding stress tests
+npm run test:fast           # Run tests excluding stress and slow tests
+npm run typecheck           # Type-check the whole suite (tsc --noEmit, strict)
 npm run test:stress         # Run only stress tests
 npm run test:html           # Run tests with HTML report
 npm run test:ci             # Run tests with HTML report (CI mode)
 npm run test:live           # Run only LIVE app tests
-npm run test:war only WARADIOadio        # Run app tests
+npm run test:waradio        # Run only WARADIO app tests
 npm run test:grid           # Run only GRID app tests
 ```
 
@@ -408,7 +410,7 @@ xdg-open playwright-report/index.html  # Linux
 
 ## Page Objects
 
-All page objects use TypeScript with JSDoc annotations for IDE support.
+All page objects are TypeScript classes extending `BasePage`.
 
 ### LivePage.ts
 
@@ -469,10 +471,10 @@ Generic app page object for link checking. Provides methods for:
 
 Use `createTestSuite` for consistent browser lifecycle:
 
-```javascript
-const { test, expect } = require('@playwright/test');
-const { createLivePage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
+```typescript
+import { test, expect } from '@playwright/test';
+import { createLivePage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const liveContext = createTestSuite({
   pageName: 'Live',
@@ -496,28 +498,25 @@ test.describe('New Feature', () => {
 Extend `BasePage` in TypeScript:
 
 ```typescript
-const BasePage = require('./BasePage');
-const { getAppUrl } = require('../config');
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { getAppUrl } from '../config';
 
-/** @typedef {import('@playwright/test').Page} Page */
-
-class NewPage extends BasePage {
-  /** @param {Page} page */
-  constructor(page) {
+export class NewPage extends BasePage {
+  constructor(page: Page) {
     super(page, getAppUrl('newapp'));
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeaderTitle() {
+  getHeaderTitle(): Locator {
     return this.page.locator('h1');
   }
 }
-
-module.exports = NewPage;
 ```
+
+Then export a `createNewPage` factory from `pages/index.ts`.
 
 ## Requirements
 
-- Node.js 12+
+- Node.js 20+
 - @playwright/test
-- TypeScript (for page objects)
+- TypeScript

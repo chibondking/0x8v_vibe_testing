@@ -10,16 +10,15 @@
  * - ADIF loading tests (skipped for manual review)
  */
 
-const { test, expect, chromium } = require('@playwright/test');
-const path = require('path');
-const { createGridPage } = require('../pages');
+import { test, expect, chromium, type Page } from '@playwright/test';
+import { createGridPage, type GridPage } from '../pages';
 
 /**
  * Test Suite for GRID Square Visualizer
  */
 test.describe('GRID App - Initial Load', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -131,8 +130,8 @@ test.describe('GRID App - Initial Load', () => {
 });
 
 test.describe('GRID App - Happy Path', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -240,14 +239,14 @@ test.describe('GRID App - Happy Path', () => {
     await gridPage.clickViewStats();
     
     // Stats content should have some text
-    const statsBody = await page.locator('#stats-body').textContent();
+    const statsBody = (await page.locator('#stats-body').textContent()) ?? '';
     expect(statsBody.length).toBeGreaterThan(0);
   });
 });
 
 test.describe('GRID App - Edge Cases', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -316,7 +315,7 @@ test.describe('GRID App - Edge Cases', () => {
     await page.waitForTimeout(500);
     
     // Demo data clears file info after loading
-    const fileInfo = await gridPage.getFileInfo().textContent();
+    const fileInfo = (await gridPage.getFileInfo().textContent()) ?? '';
     expect(fileInfo).not.toContain('Loading');
   });
 
@@ -349,8 +348,8 @@ test.describe('GRID App - Edge Cases', () => {
 });
 
 test.describe('GRID App - UI/UX', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -425,7 +424,7 @@ test.describe('GRID App - UI/UX', () => {
   });
 
   test('page loads without JavaScript errors', async () => {
-    const errors = [];
+    const errors: string[] = [];
     
     page.on('pageerror', error => {
       errors.push(error.message);
@@ -482,8 +481,8 @@ test.describe('GRID App - UI/UX', () => {
 });
 
 test.describe('GRID App - ADIF Loading', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -515,7 +514,7 @@ test.describe('GRID App - ADIF Loading', () => {
     // This test requires manual review of file info display behavior
     // const adifPath = path.join(__dirname, '../fixtures/demo.adif');
     // await gridPage.getAdifFileInput().setInputFiles(adifPath);
-    // const fileInfo = await gridPage.getFileInfo().textContent();
+    // const fileInfo = (await gridPage.getFileInfo().textContent()) ?? '';
     // expect(fileInfo.length).toBeGreaterThan(0);
   });
 
@@ -546,8 +545,8 @@ test.describe('GRID App - ADIF Loading', () => {
 });
 
 test.describe('GRID App - Map Features', () => {
-  let page;
-  let gridPage;
+  let page: Page;
+  let gridPage: GridPage;
 
   test.beforeAll(async () => {
     const browser = await chromium.launch();
@@ -597,8 +596,8 @@ test.describe('GRID App - Map Features', () => {
     await gridPage.loadDemoData();
     await page.waitForTimeout(1000);
     
-    const fieldLabels = await page.locator('.field-rect');
-    // Field rects may or may not be visible depending on zoom level
+    // Field rects may or may not be visible depending on zoom level, but they are drawn
+    await expect(page.locator('.field-rect').first()).toBeAttached();
   });
 
   test('bright map mode changes map appearance', async () => {

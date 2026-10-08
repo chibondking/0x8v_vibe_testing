@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-const { getAppUrl, CONFIG } = require('../config');
+import { getAppUrl, CONFIG } from '../config';
 
 interface LinkInfo {
   url: string;

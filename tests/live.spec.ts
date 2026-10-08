@@ -1,10 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createLivePage } = require('../pages');
-const { createTestSuite, closeBrowser } = require('./test-utils');
-
-/**
- * @typedef {import('../pages/LivePage')} LivePage
- */
+import { test, expect } from '@playwright/test';
+import { createLivePage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const liveContext = createTestSuite({
   pageName: 'Live',

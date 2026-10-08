@@ -1,10 +1,20 @@
-const { shouldSkipLink, getAppUrl } = require('../config');
+import type { Locator, Page, Response } from '@playwright/test';
+import { shouldSkipLink } from '../config';
 
-class BasePage {
-  constructor(page, baseUrl) {
+export interface Link {
+  url: string;
+  text: string;
+  href: string | null;
+}
+
+export class BasePage {
+  readonly page: Page;
+  readonly baseUrl: string;
+  protected errors: string[] = [];
+
+  constructor(page: Page, baseUrl: string) {
     this.page = page;
     this.baseUrl = baseUrl;
-    this.errors = [];
 
     this.page.on('console', msg => {
       if (msg.type() === 'error') {
@@ -20,7 +30,7 @@ class BasePage {
     });
   }
 
-  isIgnorableError(text) {
+  isIgnorableError(text: string): boolean {
     const ignorablePatterns = [
       'net::ERR_',
       'favicon',
@@ -29,7 +39,7 @@ class BasePage {
     return ignorablePatterns.some(pattern => text.includes(pattern));
   }
 
-  async goto(path = '/', options = {}) {
+  async goto(path = '/', options: Parameters<Page['goto']>[1] = {}): Promise<Response | null> {
     const url = `${this.baseUrl}${path}`;
     return this.page.goto(url, {
       waitUntil: 'networkidle',
@@ -38,17 +48,22 @@ class BasePage {
     });
   }
 
-  getPageErrors() {
+  /** Text content of a locator, with a missing node read as ''. */
+  async textOf(locator: Locator): Promise<string> {
+    return (await locator.textContent()) ?? '';
+  }
+
+  getPageErrors(): string[] {
     return this.errors;
   }
 
-  clearErrors() {
+  clearErrors(): void {
     this.errors = [];
   }
 
-  async getAllLinks() {
+  async getAllLinks(): Promise<Link[]> {
     return this.page.evaluate(() => {
-      const anchorTags = Array.from(document.querySelectorAll('a[href]'));
+      const anchorTags = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href]'));
       return anchorTags.map(a => ({
         url: a.href,
         text: a.textContent ? a.textContent.trim() : '',
@@ -57,7 +72,7 @@ class BasePage {
     });
   }
 
-  async getApplicableLinks() {
+  async getApplicableLinks(): Promise<Link[]> {
     const links = await this.getAllLinks();
     return links.filter(link => {
       if (link.url.startsWith('mailto:')) return false;
@@ -66,15 +81,15 @@ class BasePage {
     });
   }
 
-  async getSkippedLinks() {
+  async getSkippedLinks(): Promise<Link[]> {
     const links = await this.getApplicableLinks();
     return links.filter(link => shouldSkipLink(link.url).skipped);
   }
 
-  async getTestableLinks() {
+  async getTestableLinks(): Promise<Link[]> {
     const links = await this.getApplicableLinks();
     return links.filter(link => !shouldSkipLink(link.url).skipped);
   }
 }
 
-module.exports = BasePage;
+export default BasePage;

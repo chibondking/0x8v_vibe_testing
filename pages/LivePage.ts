@@ -1,151 +1,120 @@
-const BasePage = require('./BasePage');
-const { getAppUrl } = require('../config');
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { getAppUrl } from '../config';
 
-/** @typedef {import('@playwright/test').Page} Page */
+export class LivePage extends BasePage {
+  readonly appName = 'live';
+  readonly appUrl: string;
 
-class LivePage extends BasePage {
-  /** @param {Page} page */
-  constructor(page) {
+  constructor(page: Page) {
     super(page, getAppUrl('live'));
-    this.appName = 'live';
     this.appUrl = getAppUrl('live');
   }
 
-  async load() {
+  async load(): Promise<this> {
     await this.goto('/');
     return this;
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeaderTitle() {
+  getHeaderTitle(): Locator {
     return this.page.locator('h1');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSystemStatus() {
+  getSystemStatus(): Locator {
     return this.page.locator('#system-status');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTimestampDisplay() {
+  getTimestampDisplay(): Locator {
     return this.page.locator('#timestamp-display');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getLocationDisplay() {
+  getLocationDisplay(): Locator {
     return this.page.locator('.status-location');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMap() {
+  getMap(): Locator {
     return this.page.locator('#map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getModeButtons() {
+  getModeButtons(): Locator {
     return this.page.locator('.control-panel .panel-section button');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getBandButtons() {
+  getBandButtons(): Locator {
     return this.page.locator('.control-panel .panel-section').nth(1).locator('button');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getColorByBandCheckbox() {
+  getColorByBandCheckbox(): Locator {
     return this.page.locator('#color-by-band');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getBrightMapCheckbox() {
+  getBrightMapCheckbox(): Locator {
     return this.page.locator('#bright-map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getClassicFormatCheckbox() {
+  getClassicFormatCheckbox(): Locator {
     return this.page.locator('#classic-format');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getShowLabelsCheckbox() {
+  getShowLabelsCheckbox(): Locator {
     return this.page.locator('#show-labels');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getDrawLinesCheckbox() {
+  getDrawLinesCheckbox(): Locator {
     return this.page.locator('#draw-lines');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getConnectLiveButton() {
+  getConnectLiveButton(): Locator {
     return this.page.locator('#btn-connect');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSpotCount() {
+  getSpotCount(): Locator {
     return this.page.locator('.live-feed-stats');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getClearAllButton() {
+  getClearAllButton(): Locator {
     return this.page.locator('#btn-clear');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeardMeButton() {
+  getHeardMeButton(): Locator {
     return this.page.locator('#btn-heard-me');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeardByMeButton() {
+  getHeardByMeButton(): Locator {
     return this.page.locator('#btn-heard-by-me');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getEnableLocationButton() {
+  getEnableLocationButton(): Locator {
     return this.page.locator('#btn-enable-location');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMyCallInput() {
+  getMyCallInput(): Locator {
     return this.page.locator('#my-call');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getZoomInButton() {
+  getZoomInButton(): Locator {
     return this.page.locator('.leaflet-control-zoom-in');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getZoomOutButton() {
+  getZoomOutButton(): Locator {
     return this.page.locator('.leaflet-control-zoom-out');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusLeft() {
+  getStatusLeft(): Locator {
     return this.page.locator('#status-left');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusRight() {
+  getStatusRight(): Locator {
     return this.page.locator('#status-right');
   }
 
-  /**
-   * @param {string} mode
-   * @returns {Promise<LivePage>}
-   */
-  async clickModeButton(mode) {
+  async clickModeButton(mode: string): Promise<LivePage> {
     const button = this.page.locator(`.mode-filter button:has-text("${mode}")`);
     await button.click();
     return this;
   }
 
-  /**
-   * @param {string} band
-   * @returns {Promise<LivePage>}
-   */
-  async clickBandButton(band) {
+  async clickBandButton(band: string): Promise<LivePage> {
     const button = this.page.locator(`.band-filter button:has-text("${band}")`);
     await button.click();
     return this;
@@ -161,11 +130,7 @@ class LivePage extends BasePage {
     return this;
   }
 
-  /**
-   * @param {string} callsign
-   * @returns {Promise<LivePage>}
-   */
-  async setMyCall(callsign) {
+  async setMyCall(callsign: string): Promise<LivePage> {
     await this.getMyCallInput().fill(callsign);
     return this;
   }
@@ -175,30 +140,23 @@ class LivePage extends BasePage {
     return this;
   }
 
-  /** @returns {Promise<number>} */
-  async getSpotCountValue() {
-    const countText = await this.getSpotCount().textContent();
+  async getSpotCountValue(): Promise<number> {
+    const countText = await this.textOf(this.getSpotCount());
     const match = countText.match(/\d+/);
     return match ? parseInt(match[0]) : 0;
   }
 
-  /** @returns {Promise<boolean>} */
-  async isConnected() {
-    const text = await this.getConnectLiveButton().textContent();
+  async isConnected(): Promise<boolean> {
+    const text = await this.textOf(this.getConnectLiveButton());
     return text.includes('DISCONNECT');
   }
 
-  /** @returns {Promise<boolean>} */
-  async isLiveFeedActive() {
-    const buttonText = await this.getConnectLiveButton().textContent();
+  async isLiveFeedActive(): Promise<boolean> {
+    const buttonText = await this.textOf(this.getConnectLiveButton());
     return buttonText.includes('DISCONNECT') || buttonText.includes('LIVE');
   }
 
-  /**
-   * @param {number} [timeout]
-   * @returns {Promise<boolean>}
-   */
-  async waitForSpots(timeout = 30000) {
+  async waitForSpots(timeout: number = 30000): Promise<boolean> {
     try {
       await this.page.waitForFunction(() => {
         const spotCount = document.getElementById('spot-count');
@@ -211,17 +169,12 @@ class LivePage extends BasePage {
     }
   }
 
-  /**
-   * @param {number} previousCount
-   * @param {number} [timeout]
-   * @returns {Promise<boolean>}
-   */
-  async waitForNewSpot(previousCount, timeout = 5000) {
+  async waitForNewSpot(previousCount: number, timeout: number = 5000): Promise<boolean> {
     try {
       await this.page.waitForFunction((prevCount) => {
         const spotCount = document.getElementById('spot-count');
-        return spotCount && parseInt(spotCount.textContent) > prevCount;
-      }, { timeout }, previousCount);
+        return spotCount !== null && parseInt(spotCount.textContent ?? '') > prevCount;
+      }, previousCount, { timeout });
       return true;
     } catch (error) {
       console.error('Timeout waiting for new spot');
@@ -229,21 +182,18 @@ class LivePage extends BasePage {
     }
   }
 
-  /** @returns {Promise<{spotCount: string, myCall: string}>} */
-  async getStatistics() {
+  async getStatistics(): Promise<{spotCount: string, myCall: string}> {
     return {
-      spotCount: await this.getSpotCount().textContent(),
+      spotCount: await this.textOf(this.getSpotCount()),
       myCall: await this.getMyCallInput().inputValue(),
     };
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSpotElements() {
+  getSpotElements(): Locator {
     return this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
   }
 
-  /** @returns {Promise<string|null>} */
-  async getLiveFeedStatus() {
+  async getLiveFeedStatus(): Promise<string|null> {
     const statusElement = this.page.locator('#live-feed-status, .feed-status, [class*="status"]');
     if (await statusElement.count() > 0) {
       return await statusElement.textContent();
@@ -251,11 +201,7 @@ class LivePage extends BasePage {
     return null;
   }
 
-  /**
-   * @param {number} [index]
-   * @returns {Promise<{text: string, locator: import('@playwright/test').Locator}|null>}
-   */
-  async getSpotData(index = 0) {
+  async getSpotData(index: number = 0): Promise<{text: string, locator: Locator}|null> {
     const spots = this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
     const count = await spots.count();
     if (count === 0 || index >= count) {
@@ -263,38 +209,34 @@ class LivePage extends BasePage {
     }
     const spot = spots.nth(index);
     return {
-      text: await spot.textContent(),
+      text: await this.textOf(spot),
       locator: spot,
     };
   }
 
-  /** @returns {Promise<Array<{text: string, locator: import('@playwright/test').Locator}>>} */
-  async getAllSpotData() {
+  async getAllSpotData(): Promise<Array<{text: string, locator: Locator}>> {
     const spots = this.page.locator('.live-spot, .spot-item, .spot-row, tr[class*="spot"]');
     const count = await spots.count();
     const spotData = [];
     for (let i = 0; i < Math.min(count, 50); i++) {
       const spot = spots.nth(i);
       spotData.push({
-        text: await spot.textContent(),
+        text: await this.textOf(spot),
         locator: spot,
       });
     }
     return spotData;
   }
 
-  /** @returns {Promise<import('@playwright/test').Locator>} */
-  async getMapMarkers() {
+  async getMapMarkers(): Promise<Locator> {
     return this.page.locator('.leaflet-marker-icon, .marker, [class*="marker"]');
   }
 
-  /** @returns {Promise<import('@playwright/test').Locator>} */
-  async getMapLines() {
+  async getMapLines(): Promise<Locator> {
     return this.page.locator('.leaflet-polyline, .line, [class*="line"]');
   }
 
-  /** @returns {Promise<string|null>} */
-  async getCurrentTimestamp() {
+  async getCurrentTimestamp(): Promise<string|null> {
     const timestampElement = this.page.locator('#timestamp-display, .timestamp');
     if (await timestampElement.count() > 0) {
       return await timestampElement.textContent();
@@ -302,8 +244,7 @@ class LivePage extends BasePage {
     return null;
   }
 
-  /** @returns {Promise<{spotCount: number, isConnected: boolean, timestamp: string|null, status: string|null}>} */
-  async getFeedInfo() {
+  async getFeedInfo(): Promise<{spotCount: number, isConnected: boolean, timestamp: string|null, status: string|null}> {
     return {
       spotCount: await this.getSpotCountValue(),
       isConnected: await this.isLiveFeedActive(),
@@ -313,4 +254,4 @@ class LivePage extends BasePage {
   }
 }
 
-module.exports = LivePage;
+export default LivePage;

@@ -1,10 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createGridPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
-
-/**
- * @typedef {import('../pages/GridPage')} GridPage
- */
+import { test, expect } from '@playwright/test';
+import { createGridPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const gridContext = createTestSuite({
   pageName: 'GRID',
@@ -70,7 +66,7 @@ test.describe('GRID App - Happy Path', () => {
   test('stats popup contains data', async () => {
     const gridPage = gridContext.getPageObject();
     await gridPage.clickViewStats();
-    const popupText = await gridPage.getStatsPopup().textContent();
+    const popupText = (await gridPage.getStatsPopup().textContent()) ?? '';
     expect(popupText).toContain('LOG STATISTICS');
     expect(popupText).toContain('Total Contacts');
     expect(popupText).toContain('Unique Grids');
@@ -93,6 +89,7 @@ test.describe('GRID App - Happy Path', () => {
     const gridPage = gridContext.getPageObject();
     const bounds = await gridPage.getMapBounds();
     expect(bounds).not.toBeNull();
+    if (!bounds) return;
     expect(bounds.north).toBeGreaterThan(bounds.south);
     expect(bounds.east).toBeGreaterThan(bounds.west);
   });

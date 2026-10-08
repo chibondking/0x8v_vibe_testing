@@ -1,212 +1,174 @@
-const BasePage = require('./BasePage');
-const { getAppUrl } = require('../config');
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { getAppUrl } from '../config';
 
-/** @typedef {import('@playwright/test').Page} Page */
+export class GridPage extends BasePage {
+  readonly appName = 'grid';
+  readonly appUrl: string;
 
-class GridPage extends BasePage {
-  /** @param {Page} page */
-  constructor(page) {
+  constructor(page: Page) {
     super(page, getAppUrl('grid'));
-    this.appName = 'grid';
     this.appUrl = getAppUrl('grid');
   }
 
-  async load() {
+  async load(): Promise<this> {
     await this.goto('/');
     return this;
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getHeaderTitle() {
+  getHeaderTitle(): Locator {
     return this.page.locator('.header-left h1');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getSystemStatus() {
+  getSystemStatus(): Locator {
     return this.page.locator('#system-status');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTimestampDisplay() {
+  getTimestampDisplay(): Locator {
     return this.page.locator('#timestamp-display');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getWoprLights() {
+  getWoprLights(): Locator {
     return this.page.locator('.header-wopr-lights');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getDataInputSection() {
+  getDataInputSection(): Locator {
     return this.page.locator('.control-panel .panel-section').first();
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getAdifFileInput() {
+  getAdifFileInput(): Locator {
     return this.page.locator('#adif-file');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getLoadDemoDataButton() {
+  getLoadDemoDataButton(): Locator {
     return this.page.locator('#btn-demo');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getFileInfo() {
+  getFileInfo(): Locator {
     return this.page.locator('#file-info');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMyGridInput() {
+  getMyGridInput(): Locator {
     return this.page.locator('#my-grid');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getDisplayOptionsSection() {
+  getDisplayOptionsSection(): Locator {
     return this.page.locator('.panel-section').nth(1);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getColorByBandCheckbox() {
+  getColorByBandCheckbox(): Locator {
     return this.page.locator('#color-by-band');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getBrightMapCheckbox() {
+  getBrightMapCheckbox(): Locator {
     return this.page.locator('#bright-map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getShowFieldsCheckbox() {
+  getShowFieldsCheckbox(): Locator {
     return this.page.locator('#show-fields');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getShowFieldLabelsCheckbox() {
+  getShowFieldLabelsCheckbox(): Locator {
     return this.page.locator('#show-field-labels');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getScreenshotButton() {
+  getScreenshotButton(): Locator {
     return this.page.locator('#btn-screenshot');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getFfmaButtonContainer() {
+  getFfmaButtonContainer(): Locator {
     return this.page.locator('#ffma-button-container');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatisticsSection() {
+  getStatisticsSection(): Locator {
     return this.page.locator('.panel-section').nth(2);
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getTotalContacts() {
+  getTotalContacts(): Locator {
     return this.page.locator('#stat-total');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getUniqueGrids() {
+  getUniqueGrids(): Locator {
     return this.page.locator('#stat-grids');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getCountries() {
+  getCountries(): Locator {
     return this.page.locator('#stat-countries');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getViewStatsButton() {
+  getViewStatsButton(): Locator {
     return this.page.locator('#btn-stats');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatsPopup() {
+  getStatsPopup(): Locator {
     return this.page.locator('#stats-popup');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getCloseStatsButton() {
+  getCloseStatsButton(): Locator {
     return this.page.locator('#btn-close-stats');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMap() {
+  getMap(): Locator {
     return this.page.locator('#map');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMapContainer() {
+  getMapContainer(): Locator {
     return this.page.locator('.map-container');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getLoadingOverlay() {
+  getLoadingOverlay(): Locator {
     return this.page.locator('#loading-overlay');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getLoadingMessage() {
+  getLoadingMessage(): Locator {
     return this.page.locator('#loading-message');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getErrorPopup() {
+  getErrorPopup(): Locator {
     return this.page.locator('#error-popup');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getErrorText() {
+  getErrorText(): Locator {
     return this.page.locator('.error-text');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusBarLeft() {
+  getStatusBarLeft(): Locator {
     return this.page.locator('#status-left');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusBarRight() {
+  getStatusBarRight(): Locator {
     return this.page.locator('#status-right');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusLeft() {
+  getStatusLeft(): Locator {
     return this.getStatusBarLeft();
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getStatusRight() {
+  getStatusRight(): Locator {
     return this.getStatusBarRight();
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMobileControls() {
+  getMobileControls(): Locator {
     return this.page.locator('.mobile-controls');
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  getMobileDemoButton() {
+  getMobileDemoButton(): Locator {
     return this.page.locator('#btn-demo-mobile');
   }
 
-  /** @returns {Promise<GridPage>} */
-  async loadDemoData() {
+  async loadDemoData(): Promise<GridPage> {
     await this.getLoadDemoDataButton().click();
     await this.waitForDataLoaded();
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async loadDemoDataMobile() {
+  async loadDemoDataMobile(): Promise<GridPage> {
     await this.getMobileDemoButton().click();
     await this.waitForDataLoaded();
     return this;
   }
 
-  /** @returns {Promise<boolean>} */
-  async waitForDataLoaded() {
+  async waitForDataLoaded(): Promise<boolean> {
     try {
       await this.page.waitForFunction(() => {
         const total = document.getElementById('stat-total');
@@ -219,36 +181,31 @@ class GridPage extends BasePage {
     }
   }
 
-  /** @returns {Promise<{total: string, grids: string, countries: string}>} */
-  async getStatistics() {
+  async getStatistics(): Promise<{total: string, grids: string, countries: string}> {
     return {
-      total: await this.getTotalContacts().textContent(),
-      grids: await this.getUniqueGrids().textContent(),
-      countries: await this.getCountries().textContent(),
+      total: await this.textOf(this.getTotalContacts()),
+      grids: await this.textOf(this.getUniqueGrids()),
+      countries: await this.textOf(this.getCountries()),
     };
   }
 
-  /** @returns {Promise<GridPage>} */
-  async toggleBrightMap() {
+  async toggleBrightMap(): Promise<GridPage> {
     await this.getBrightMapCheckbox().click();
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async toggleColorByBand() {
+  async toggleColorByBand(): Promise<GridPage> {
     await this.getColorByBandCheckbox().click();
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async openStats() {
+  async openStats(): Promise<GridPage> {
     await this.getViewStatsButton().click();
     await this.page.waitForSelector('#stats-popup:not(.hidden)');
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async closeStats() {
+  async closeStats(): Promise<GridPage> {
     await this.getCloseStatsButton().click();
     await this.page.waitForFunction(() => {
       const el = document.getElementById('stats-popup');
@@ -257,47 +214,36 @@ class GridPage extends BasePage {
     return this;
   }
 
-  /**
-   * @param {string} grid
-   * @returns {Promise<GridPage>}
-   */
-  async setMyGrid(grid) {
+  async setMyGrid(grid: string): Promise<GridPage> {
     await this.getMyGridInput().clear();
     await this.getMyGridInput().fill(grid);
     return this;
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  async getGridSquares() {
+  getGridSquares(): Locator {
     return this.page.locator('.grid-square-rect');
   }
 
-  /** @returns {Promise<number>} */
-  async getGridSquareCount() {
-    const squares = await this.getGridSquares();
-    return await squares.count();
+  async getGridSquareCount(): Promise<number> {
+    return this.getGridSquares().count();
   }
 
-  /** @returns {import('@playwright/test').Locator} */
-  async getFieldLabels() {
+  getFieldLabels(): Locator {
     return this.page.locator('.field-label');
   }
 
-  /** @returns {Promise<GridPage>} */
-  async clickScreenshot() {
+  async clickScreenshot(): Promise<GridPage> {
     await this.getScreenshotButton().click();
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async clickViewStats() {
+  async clickViewStats(): Promise<GridPage> {
     await this.getViewStatsButton().click();
     await this.page.waitForSelector('#stats-popup:not(.hidden)');
     return this;
   }
 
-  /** @returns {Promise<GridPage>} */
-  async closeStatsPopup() {
+  async closeStatsPopup(): Promise<GridPage> {
     const popup = this.getStatsPopup();
     const isHidden = await popup.evaluate(el => el.classList.contains('hidden'));
     if (!isHidden) {
@@ -310,27 +256,23 @@ class GridPage extends BasePage {
     return this;
   }
 
-  /** @returns {Promise<boolean>} */
-  async isColorByBandEnabled() {
+  async isColorByBandEnabled(): Promise<boolean> {
     return await this.getColorByBandCheckbox().isChecked();
   }
 
-  /** @returns {Promise<GridPage>} */
-  async toggleShowFields() {
+  async toggleShowFields(): Promise<GridPage> {
     await this.getShowFieldsCheckbox().click();
     return this;
   }
 
-  /**
-   * @returns {Promise<{north: number, south: number, east: number, west: number} | null>}
-   */
-  async getMapBounds() {
+  async getMapBounds(): Promise<{north: number, south: number, east: number, west: number} | null> {
     return await this.page.evaluate(() => {
-      const map = document.getElementById('map');
+      // Leaflet attaches untyped properties to the map element and its instance
+      const map = document.getElementById('map') as (HTMLElement & { _leaflet_id?: number }) | null;
       if (map && map._leaflet_id) {
-        const leafletMap = Object.values(window).find(obj =>
-          obj._container === map && obj.getBounds
-        );
+        const leafletMap = Object.values(window).find((obj: any) =>
+          obj && obj._container === map && obj.getBounds
+        ) as any;
         if (leafletMap) {
           const bounds = leafletMap.getBounds();
           return {
@@ -345,11 +287,10 @@ class GridPage extends BasePage {
     });
   }
 
-  /** @returns {Promise<number>} */
-  async getVisibleGrids() {
+  async getVisibleGrids(): Promise<number> {
     const count = await this.page.locator('.grid-square-rect').count();
     return count;
   }
 }
 
-module.exports = GridPage;
+export default GridPage;

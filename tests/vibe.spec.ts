@@ -1,23 +1,15 @@
-const { test, expect } = require('@playwright/test');
-const { createLandingPage } = require('../pages');
-const { getAppsConfig, getAppUrl, CONFIG } = require('../config');
-const { createTestSuite, closeBrowser } = require('./test-utils');
-const { MOBILE_VIEWPORT, TABLET_VIEWPORT, DESKTOP_VIEWPORT } = require('./assertions');
+import { test, expect, type Page } from '@playwright/test';
+import { createLandingPage } from '../pages';
+import { getAppsConfig, getAppUrl, CONFIG } from '../config';
+import { createTestSuite, createBrowser } from './test-utils';
+import { MOBILE_VIEWPORT, TABLET_VIEWPORT, DESKTOP_VIEWPORT } from './assertions';
 
 const LARGE_VIEWPORT = { width: 2560, height: 1440 };
-
-/**
- * @typedef {import('../pages/LandingPage')} LandingPage
- */
 
 const vibeContext = createTestSuite({
   pageName: 'Vibe',
   createPageObject: createLandingPage,
 });
-
-/**
- * @typedef {import('../pages/LandingPage')} LandingPage
- */
 
 test.describe('Vibe Landing Page', () => {
   test.beforeAll(vibeContext.beforeAll);
@@ -104,10 +96,10 @@ test.describe('Vibe Landing Page', () => {
 });
 
 test.describe('Vibe Landing Page @stress', () => {
-  let page;
+  let page: Page;
 
   test.beforeAll(async () => {
-    const { browser } = await require('./test-utils').createBrowser();
+    const { browser } = await createBrowser();
     page = await browser.newPage();
   });
 
@@ -151,7 +143,7 @@ test.describe('Vibe Landing Page @stress', () => {
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     
-    const activeElement = await page.evaluate(() => document.activeElement.tagName);
+    const activeElement = await page.evaluate(() => document.activeElement?.tagName);
     expect(['A', 'BUTTON', 'INPUT']).toContain(activeElement);
   });
 
@@ -160,7 +152,7 @@ test.describe('Vibe Landing Page @stress', () => {
     const count = await cards.count();
     
     for (let i = 0; i < count; i++) {
-      const cardContent = await cards.nth(i).textContent();
+      const cardContent = (await cards.nth(i).textContent()) ?? '';
       expect(cardContent).not.toContain('<script>');
       expect(cardContent).not.toContain('javascript:');
     }

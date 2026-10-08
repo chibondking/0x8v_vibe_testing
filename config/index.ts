@@ -1,33 +1,44 @@
-const getBaseUrl = () => process.env.BASE_URL || 'https://vibe.0x8v.io';
-const getDomain = () => process.env.DOMAIN || '0x8v.io';
+export interface AppConfig {
+  name: string;
+  path: string;
+  description: string;
+}
 
-const CONFIG = {
+export interface SkipResult {
+  skipped: boolean;
+  reason: 'anchor' | 'external' | null;
+}
+
+const getBaseUrl = (): string => process.env.BASE_URL || 'https://vibe.0x8v.io';
+const getDomain = (): string => process.env.DOMAIN || '0x8v.io';
+
+export const CONFIG = {
   baseUrl: getBaseUrl(),
   domain: getDomain(),
   apps: [
     { name: 'live', path: '/', description: 'FT8 Live Map' },
     { name: 'grid', path: '/', description: 'Grid Square Visualizer' },
     { name: 'waradio', path: '/', description: 'ADIF Log Visualizer' },
-  ],
+  ] as AppConfig[],
   skipPatterns: {
     anchors: ['#'],
     externalDomains: ['leafletjs.com', 'openstreetmap.org', 'carto.com'],
   },
 };
 
-function getAppUrl(appName) {
+export function getAppUrl(appName: string): string {
   return `https://${appName}.${CONFIG.domain}`;
 }
 
-function getLandingPageUrl() {
+export function getLandingPageUrl(): string {
   return CONFIG.baseUrl;
 }
 
-function getAppsConfig() {
+export function getAppsConfig(): AppConfig[] {
   return CONFIG.apps;
 }
 
-function shouldSkipLink(url) {
+export function shouldSkipLink(url: string): SkipResult {
   if (CONFIG.skipPatterns.anchors.some(anchor => url.endsWith(anchor))) {
     return { skipped: true, reason: 'anchor' };
   }
@@ -36,11 +47,3 @@ function shouldSkipLink(url) {
   }
   return { skipped: false, reason: null };
 }
-
-module.exports = {
-  CONFIG,
-  getAppUrl,
-  getLandingPageUrl,
-  getAppsConfig,
-  shouldSkipLink,
-};

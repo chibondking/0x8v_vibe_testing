@@ -1,6 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createWaradioPage } = require('../pages');
-const { createTestSuite } = require('./test-utils');
+import { test, expect } from '@playwright/test';
+import { createWaradioPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const waradioContext = createTestSuite({
   pageName: 'WARADIO',

@@ -1,10 +1,6 @@
-const { test, expect } = require('@playwright/test');
-const { createGridPage } = require('../pages');
-const { createTestSuite, MOBILE_VIEWPORT } = require('./test-utils');
-
-/**
- * @typedef {import('../pages/GridPage')} GridPage
- */
+import { test, expect } from '@playwright/test';
+import { createGridPage } from '../pages';
+import { createTestSuite } from './test-utils';
 
 const gridContext = createTestSuite({
   pageName: 'GRID',
